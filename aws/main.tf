@@ -17,7 +17,7 @@ provider "aws" {
 }
 
 resource "aws_vpc" "workshop" {
-  cidr_block       = "${var.address_space}"
+  cidr_block       = "${var.address_space}0.0/16"
   tags = {
     Name = "${var.prefix}-workshop"
     environment = "Production"
@@ -37,7 +37,7 @@ resource "aws_subnet" "subnet" {
 resource "aws_subnet" "subnet2" {
   vpc_id     = "${aws_vpc.workshop.id}"
   availability_zone = "${var.region}b"
-  cidr_block = "10.0.11.0/24"
+  cidr_block = "${var.address_space}11.0/24"
 
   tags = {
     Name = "${var.prefix}-workshop-subnet"
