@@ -37,7 +37,7 @@ resource "aws_subnet" "subnet" {
 resource "aws_subnet" "subnet2" {
   vpc_id     = "${aws_vpc.workshop.id}"
   availability_zone = "${var.region}b"
-  cidr_block = "${var.address_space}11.0/24"
+  cidr_block = "${var.address_space}.11.0/24"
 
   tags = {
     Name = "${var.prefix}-workshop-subnet"
