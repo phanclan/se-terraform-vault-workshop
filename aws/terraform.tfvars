@@ -2,3 +2,4 @@
 # Prefix must be all lowercase letters, no symbols please.
 
 prefix = "pphan"
+region = "us-west-2"

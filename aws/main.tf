@@ -20,6 +20,7 @@ resource "aws_vpc" "workshop" {
   cidr_block       = "${var.address_space}"
   tags = {
     Name = "${var.prefix}-workshop"
+    environment = "Production"
   }
 }
 
