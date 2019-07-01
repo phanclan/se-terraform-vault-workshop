@@ -23,15 +23,15 @@ resource "aws_vpc" "workshop" {
   }
 }
 
-# resource "aws_subnet" "subnet" {
-#   vpc_id     = "${aws_vpc.workshop.id}"
-#   availability_zone = "us-east-1a"
-#   cidr_block = "${var.subnet_prefix}"
+resource "aws_subnet" "subnet" {
+  vpc_id     = "${aws_vpc.workshop.id}"
+  availability_zone = "us-east-1a"
+  cidr_block = "${var.subnet_prefix}"
 
-#   tags = {
-#     Name = "${var.prefix}-workshop-subnet"
-#   }
-# }
+  tags = {
+    Name = "${var.prefix}-workshop-subnet"
+  }
+}
 
 # resource "aws_subnet" "subnet2" {
 #   vpc_id     = "${aws_vpc.workshop.id}"
