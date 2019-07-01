@@ -34,15 +34,15 @@ resource "aws_subnet" "subnet" {
   }
 }
 
-# resource "aws_subnet" "subnet2" {
-#   vpc_id     = "${aws_vpc.workshop.id}"
-#   availability_zone = "us-east-1b"
-#   cidr_block = "10.0.11.0/24"
+resource "aws_subnet" "subnet2" {
+  vpc_id     = "${aws_vpc.workshop.id}"
+  availability_zone = "us-east-1b"
+  cidr_block = "10.0.11.0/24"
 
-#   tags = {
-#     Name = "${var.prefix}-workshop-subnet"
-#   }
-# }
+  tags = {
+    Name = "${var.prefix}-workshop-subnet"
+  }
+}
 
 # resource "aws_internet_gateway" "main-gw" {
 #     vpc_id = "${aws_vpc.workshop.id}"
