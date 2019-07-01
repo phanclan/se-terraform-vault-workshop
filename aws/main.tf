@@ -25,7 +25,7 @@ resource "aws_vpc" "workshop" {
 
 resource "aws_subnet" "subnet" {
   vpc_id     = "${aws_vpc.workshop.id}"
-  availability_zone = "us-east-1a"
+  availability_zone = "${var.region}a"
   cidr_block = "${var.subnet_prefix}"
 
   tags = {
