@@ -80,6 +80,6 @@ variable "admin_password" {
 }
 
 variable "environment" {
-  description = "Dev | Prod | QA"
+  description = "Dev | Prod | QA | DMZ"
   default = "Dev"
 }
