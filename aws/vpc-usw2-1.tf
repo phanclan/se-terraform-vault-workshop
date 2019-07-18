@@ -29,7 +29,7 @@ module "vpc_usw2-1" {
   name = "tf-${var.prefix}-${var.env}-uw1-vpc"
   cidr = "10.10.0.0/16"
   azs = ["us-west-2a","us-west-2b"]
-  public_subnets = ["10.10.1.0/24","10.10.2.0/24"]
+  public_subnets = "${var.public_subnets}"
   # private_subnets     = ["10.10.11.0/24", "10.10.12.0/24"]
   enable_dns_hostnames = true
   enable_dns_support = true

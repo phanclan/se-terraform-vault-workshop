@@ -5,6 +5,9 @@
 # Terraform code. If you create a variable with no default, the user will be
 # prompted to enter it (or define it via config file or command line flags.)
 
+#------------------------------------------------
+#----- General Variables 
+#------------------------------------------------
 variable "prefix" {
   description = "This prefix will be included in the name of most resources."
 }
@@ -37,6 +40,13 @@ variable "owner" {
   default = "pphan"
 }
 
+#------------------------------------------------
+#----- Network Variables 
+#------------------------------------------------
+variable "public_subnets" {
+  default = ["10.10.1.0/24","10.10.2.0/24"]
+}
+
 variable "uw2-pub-net" {
   default = "10.1.10.0/24"
 }
@@ -57,6 +67,44 @@ variable "ue1-pri-net" {
 #   description = "key to use with instance"
 # }
 
-###################################
-#----- HashiStack Variables -----
-###################################
+#------------------------------------------------
+#----- HashiStack Variables 
+#------------------------------------------------
+
+variable "hashistack_servers"        { default = 1 }
+variable "hashistack_instance"       { default = "t2.micro" }
+variable "hashistack_consul_version" { default = "1.2.3" }
+variable "hashistack_vault_version"  { default = "0.11.3" }
+variable "hashistack_nomad_version"  { default = "0.8.6" }
+variable "hashistack_consul_url"     { default = "" }
+variable "hashistack_vault_url"      { default = "" }
+variable "hashistack_nomad_url"      { default = "" }
+variable "hashistack_image_id"       { default = "" }
+
+variable "hashistack_public" {
+  description = "Assign a public IP, open port 22 for public access, & provision into public subnets to provide easier accessibility without a Bastion host - DO NOT DO THIS IN PROD"
+  default     = true
+}
+
+variable "consul_config_override" { default = "" }
+variable "vault_config_override"  { default = "" }
+variable "nomad_config_override"  { default = "" }
+variable "nomad_docker_install"   { default = true }
+variable "nomad_java_install"     { default = true }
+
+variable "hashistack_tags" {
+  type    = "map"
+  default = { }
+}
+
+variable "hashistack_tags_list" {
+  type    = "list"
+  default = [ ]
+}
+
+
+#------------------------------------------------
+# Vault
+#------------------------------------------------
+
+
