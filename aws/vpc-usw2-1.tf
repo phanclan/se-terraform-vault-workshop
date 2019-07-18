@@ -115,23 +115,23 @@ data "aws_ami" "ubuntu" {
     owners = ["099720109477"] # Canonical
 }
 
-# resource "aws_instance" "vpc_usw2-1_bastion" {
-#   ami           = "${data.aws_ami.ubuntu.id}"
-#   #ami                         = "${var.ubuntu_ami}"
-#   instance_type               = "${var.vm_size}"
-#   associate_public_ip_address = true
-#   subnet_id                   = "${module.vpc_usw2-1.public_subnets[0]}"
-#   vpc_security_group_ids     = ["${aws_security_group.vpc_usw2-1_bastion_sg.id}", "${module.vpc_usw2-1.default_security_group_id}"]
-#   key_name                    = "${aws_key_pair.tf_usw2_ec2_key.key_name}"
-#   user_data                   = "${data.template_file.user_data.rendered}"
-#   private_ip                  = "10.10.1.10"
+resource "aws_instance" "vpc_usw2-1_bastion" {
+  ami           = "${data.aws_ami.ubuntu.id}"
+  #ami                         = "${var.ubuntu_ami}"
+  instance_type               = "${var.vm_size}"
+  associate_public_ip_address = true
+  subnet_id                   = "${module.vpc_usw2-1.public_subnets[0]}"
+  vpc_security_group_ids     = ["${aws_security_group.vpc_usw2-1_bastion_sg.id}", "${module.vpc_usw2-1.default_security_group_id}"]
+  key_name                    = "${aws_key_pair.tf_usw2_ec2_key.key_name}"
+  user_data                   = "${data.template_file.user_data.rendered}"
+  private_ip                  = "10.10.1.10"
 
-#   tags = {
-#     Name = "tf-${var.prefix}-${var.env}-usw2-1-bastion-workshop"
-#     TTL = "72"
-#     owner = "pphan@hashicorp.com"
-#   }
-# }
+  tags = {
+    Name = "tf-${var.prefix}-${var.env}-usw2-1-bastion-workshop"
+    TTL = "72"
+    owner = "pphan@hashicorp.com"
+  }
+}
 
 data "template_file" "user_data" {
   template = "${file("modules/templates/user_data.tpl")}"
