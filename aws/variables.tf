@@ -40,7 +40,7 @@ variable "owner" {
   default = "pphan"
 }
 
-variable "bastion_count" { default = "0" }
+variable "bastion_count" { default = "1" }
 variable "internal_vm_count" { default = "0"}
 
 #------------------------------------------------
