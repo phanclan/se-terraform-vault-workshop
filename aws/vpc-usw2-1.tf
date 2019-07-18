@@ -27,10 +27,10 @@ resource "aws_key_pair" "tf_usw2_ec2_key" {
 module "vpc_usw2-1" {
   source = "terraform-aws-modules/vpc/aws"
   name = "tf-${var.prefix}-${var.env}-uw1-vpc"
-  cidr = "10.10.0.0/16"
+  cidr = "${var.cidr}"
   azs = ["us-west-2a","us-west-2b"]
   public_subnets = "${var.public_subnets}"
-  # private_subnets     = ["10.10.11.0/24", "10.10.12.0/24"]
+  # private_subnets     = "${var.public_subnets}"
   enable_dns_hostnames = true
   enable_dns_support = true
   # enable_nat_gateway = true

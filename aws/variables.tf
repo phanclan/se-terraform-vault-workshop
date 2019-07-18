@@ -43,10 +43,13 @@ variable "owner" {
 #------------------------------------------------
 #----- Network Variables 
 #------------------------------------------------
+variable "cidr" { "10.10.0.0/16" }
 variable "public_subnets" {
   default = ["10.10.1.0/24","10.10.2.0/24"]
 }
-
+variable "private_subnets" {
+  default = ["10.10.11.0/24", "10.10.12.0/24"]
+}
 variable "uw2-pub-net" {
   default = "10.1.10.0/24"
 }
