@@ -115,7 +115,15 @@ data "aws_ami" "ubuntu" {
     owners = ["099720109477"] # Canonical
 }
 
+data "template_file" "user_data" {
+  template = "${file("modules/templates/user_data.tpl")}"
+  vars = {
+    prefix = "${var.prefix}"
+  }
+}
+
 resource "aws_instance" "vpc_usw2-1_bastion" {
+  count = "${var.bastion_count}"
   ami           = "${data.aws_ami.ubuntu.id}"
   #ami                         = "${var.ubuntu_ami}"
   instance_type               = "${var.vm_size}"
@@ -133,14 +141,8 @@ resource "aws_instance" "vpc_usw2-1_bastion" {
   }
 }
 
-data "template_file" "user_data" {
-  template = "${file("modules/templates/user_data.tpl")}"
-  vars = {
-    prefix = "${var.prefix}"
-  }
-}
 resource "aws_instance" "vpc_usw2-1_pri_ubuntu" {
-  count = "0"
+  count = "${var.internal_vm_count}"
   ami           = "${data.aws_ami.ubuntu.id}"
   #ami                         = "${var.ubuntu_ami}"
   instance_type               = "${var.vm_size}"

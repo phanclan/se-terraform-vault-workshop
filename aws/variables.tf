@@ -40,6 +40,9 @@ variable "owner" {
   default = "pphan"
 }
 
+variable "bastion_count" { default = "0" }
+variable "internal_vm_count" { default = "0"}
+
 #------------------------------------------------
 #----- Network Variables 
 #------------------------------------------------
@@ -50,21 +53,12 @@ variable "public_subnets" {
 variable "private_subnets" {
   default = ["10.10.11.0/24", "10.10.12.0/24"]
 }
-variable "uw2-pub-net" {
-  default = "10.1.10.0/24"
-}
 
-variable "uw2-pri-net" {
-  default = "10.1.100.0/24"
-}
-
-variable "ue1-pub-net" {
-  default = "10.1.20.0/24"
-}
-
-variable "ue1-pri-net" {
-  default = "10.1.200.0/24"
-}
+# the following four variables were before modules
+variable "uw2-pub-net" { default = "10.1.10.0/24" }
+variable "uw2-pri-net" { default = "10.1.100.0/24" }
+variable "ue1-pub-net" { default = "10.1.20.0/24" }
+variable "ue1-pri-net" { default = "10.1.200.0/24" }
 
 # variable "key_name" {
 #   description = "key to use with instance"
