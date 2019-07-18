@@ -1,0 +1,67 @@
+
+
+
+resource "aws_ec2_transit_gateway" "tgw" {
+  auto_accept_shared_attachments = "enable"
+  tags = {
+    Name = "tf-${var.prefix}-${var.env}-workshop"
+    TTL = "72"
+    owner = "pphan@hashicorp.com"
+  }
+}
+
+resource "aws_ec2_transit_gateway_vpc_attachment" "vpc_usw2-1_tgw_attachment" {
+  subnet_ids         = flatten(module.vpc_usw2-1.private_subnets)
+  transit_gateway_id = "${aws_ec2_transit_gateway.tgw.id}"
+  vpc_id             = "${module.vpc_usw2-1.vpc_id}"
+  tags = {
+    Name = "tf-${var.prefix}-${var.env}-workshop"
+    TTL = "72"
+    owner = "pphan@hashicorp.com"
+  }
+}
+
+resource "aws_ec2_transit_gateway_vpc_attachment" "vpc_usw2-2_tgw_attachment" {
+  subnet_ids         = flatten(module.vpc_usw2-2.private_subnets)
+  transit_gateway_id = "${aws_ec2_transit_gateway.tgw.id}"
+  vpc_id             = "${module.vpc_usw2-2.vpc_id}"
+  tags = {
+    Name = "tf-${var.prefix}-${var.env}-workshop"
+    TTL = "72"
+    owner = "pphan@hashicorp.com"
+  }
+}
+
+resource "aws_route" "tgw_route_usw2-1" {
+  route_table_id         = "${module.vpc_usw2-1.public_route_table_ids[0]}"
+  destination_cidr_block = "10.0.0.0/8"
+  transit_gateway_id     = "${aws_ec2_transit_gateway.tgw.id}"
+}
+
+resource "aws_route" "tgw_route_usw2-2" {
+  route_table_id         = "${module.vpc_usw2-2.private_route_table_ids[0]}"
+  destination_cidr_block = "10.0.0.0/8"
+  transit_gateway_id     = "${aws_ec2_transit_gateway.tgw.id}"
+}
+
+# resource "aws_route" "tgw_route-usw2-3" {
+#   route_table_id         = "${module.vpc-three.private_route_table_ids[0]}"
+#   destination_cidr_block = "10.0.0.0/8"
+#   transit_gateway_id     = "${aws_ec2_transit_gateway.tgw.id}"
+  # tags = {
+  #   Name = "tf-${var.prefix}-${var.env}-workshop"
+  #   TTL = "72"
+  #   owner = "pphan@hashicorp.com"
+  # }
+# }
+
+# resource "aws_route" "tgw_route_usw2-4" {
+#   route_table_id         = "${module.vpc_usw2-4.private_route_table_ids[0]}"
+#   destination_cidr_block = "10.0.0.0/8"
+#   transit_gateway_id     = "${aws_ec2_transit_gateway.tgw.id}"
+  # tags = {
+  #   Name = "tf-${var.prefix}-${var.env}-workshop"
+  #   TTL = "72"
+  #   owner = "pphan@hashicorp.com"
+  # }
+# }

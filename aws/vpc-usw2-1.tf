@@ -1,0 +1,213 @@
+##############################################################################
+# HashiCorp Terraform and Vault Workshop
+#
+# This Terraform configuration will create the following:
+#
+# 1. AWS VPC, two public subnets, two private subnets
+# 2. Bastion host, linux host
+# 3. A Linux server running HashiCorp Vault and a simple application
+
+# provider "aws" {
+#   region  = "${var.region}"
+# }
+
+resource "aws_key_pair" "tf_usw2_ec2_key" {
+  key_name = "tf-${var.prefix}-${var.env}-usw2-ec2-key"
+#  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCjOXiqjoBMlfCBvmG6BcUGPv1q+YqNYLHlm6X18Frue+Yf2zG/56pMWtSoPbHKB+Nul0VNpANuOyt3qsEU+HtZz9MMTBiWL6kGH6S0saLMp7EpcZaib/Qxfkl1By6JnOwr6w7eW+XE4TXHRdBKaRWW4J52KdhlPXAeMFeSDL3qnZWaP7tIyKTQzdDXu0rSJIBpcYCVCQ5BkshWNvoVpDH0dH9r4ayLrzgnNzQHyqVFASU3DxqIAqrC3JflAz1aUWiwXhDJeZU3w6eDWvYxOAm+Z2vP5oiX/pqbYMlCUlPrsU5+6828kDQ5uQaZiCnSi2Bj3BDqpJngiVvyicJgvhW9 pephan@Mac-mini.local"
+  public_key = "${file("~/.ssh/id_rsa.pub")}"
+}
+
+# module "ssh_keypair_aws" {
+#   source = "github.com/hashicorp-modules/ssh-keypair-aws"
+#   name = "tf-pphan-ssh-keypair-aws"
+# }
+
+# Use vpc module to create VPC, subnets, IGW, NGW, RT
+module "vpc_usw2-1" {
+  source = "terraform-aws-modules/vpc/aws"
+  name = "tf-${var.prefix}-${var.env}-uw1-vpc"
+  cidr = "10.10.0.0/16"
+  azs = ["us-west-2a","us-west-2b"]
+  public_subnets = ["10.10.1.0/24","10.10.2.0/24"]
+  # private_subnets     = ["10.10.11.0/24", "10.10.12.0/24"]
+  enable_dns_hostnames = true
+  enable_dns_support = true
+  # enable_nat_gateway = true
+  # single_nat_gateway = true
+  tags = {
+    Owner       = "Peter Phan"
+    Environment = "${var.env}"
+    Name        = "tf-${var.prefix}-${var.env}-usw2-1"
+  }
+  igw_tags = { Name = "tf-${var.prefix}-${var.env}-usw2-1-IGW" }
+  nat_gateway_tags = { Name = "tf-${var.prefix}-${var.env}-usw2-1-NGW"}
+  public_route_table_tags = { Name = "tf-${var.prefix}-${var.env}-usw2-1-RT-public" }
+  public_subnet_tags = { Name = "ctf-${var.prefix}-${var.env}-usw2-1-public" }
+  private_route_table_tags = { Name = "tf-${var.prefix}-${var.env}-usw2-1-RT-private" }
+  private_subnet_tags = { Name = "tf-${var.prefix}-${var.env}-usw2-1-private" }
+}
+
+resource "aws_security_group" "vpc_usw2-1_bastion_sg" {
+  name        = "tf-${var.prefix}-${var.env}-bastion-sg"
+  description = "Vault Security Group"
+  vpc_id      = "${module.vpc_usw2-1.vpc_id}"
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "tf-${var.prefix}-${var.env}-workshop"
+    TTL = "72"
+    owner = "team-se@hashicorp.com"
+  }
+}
+
+resource "aws_security_group" "vpc_usw2-1_ping_ssh_sg" {
+  name        = "tf_${var.prefix}_${var.env}_ping_ssh_sg"
+  # description = "Internal Security Group"
+  vpc_id      = "${module.vpc_usw2-1.vpc_id}"
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port   = -1
+    to_port     = -1
+    protocol    = "icmp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "tf-${var.prefix}-${var.env}-workshop"
+    TTL = "72"
+    owner = "pphan@hashicorp.com"
+  }
+}
+
+data "aws_ami" "ubuntu" {
+    most_recent = true
+    filter {
+        name   = "name"
+        values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
+    }
+    filter {
+        name   = "virtualization-type"
+        values = ["hvm"]
+    }
+    owners = ["099720109477"] # Canonical
+}
+
+resource "aws_instance" "vpc_usw2-1_bastion" {
+  ami           = "${data.aws_ami.ubuntu.id}"
+  #ami                         = "${var.ubuntu_ami}"
+  instance_type               = "${var.vm_size}"
+  associate_public_ip_address = true
+  subnet_id                   = "${module.vpc_usw2-1.public_subnets[0]}"
+  vpc_security_group_ids     = ["${aws_security_group.vpc_usw2-1_bastion_sg.id}", "${module.vpc_usw2-1.default_security_group_id}"]
+  key_name                    = "${aws_key_pair.tf_usw2_ec2_key.key_name}"
+  user_data                   = "${data.template_file.user_data.rendered}"
+  private_ip                  = "10.10.1.10"
+
+  tags = {
+    Name = "tf-${var.prefix}-${var.env}-usw2-1-bastion-workshop"
+    TTL = "72"
+    owner = "pphan@hashicorp.com"
+  }
+}
+
+data "template_file" "user_data" {
+  template = "${file("modules/templates/user_data.tpl")}"
+  vars = {
+    prefix = "${var.prefix}"
+  }
+}
+resource "aws_instance" "vpc_usw2-1_pri_ubuntu" {
+  count = "0"
+  ami           = "${data.aws_ami.ubuntu.id}"
+  #ami                         = "${var.ubuntu_ami}"
+  instance_type               = "${var.vm_size}"
+  subnet_id                   = "${module.vpc_usw2-1.private_subnets[0]}"
+  vpc_security_group_ids     = [
+    "${aws_security_group.vpc_usw2-1_ping_ssh_sg.id}", 
+    "${module.vpc_usw2-1.default_security_group_id}",
+    "${aws_security_group.elb-sg.id}"
+  ]
+  key_name                    = "${aws_key_pair.tf_usw2_ec2_key.key_name}"
+  private_ip                  = "10.10.11.1${count.index}"
+  user_data = "${data.template_file.user_data.rendered}"
+  # user_data                   = "${data.template_file.user_data.rendered}"
+  # connection {
+  #   user = "ubuntu"
+  #   host = "${self.public_ip}"
+  #   private_key = "${file("~/.ssh/id_rsa")}"
+  # }
+  # provisioner "remote-exec" {
+  #   inline = [
+  #     "sudo apt-get -y update",
+  #     "sudo apt -y install nginx",
+  #     "sudo service nginx start",
+  #   ]
+  # }
+  tags = {
+    Name = "tf-${var.prefix}-${var.env}-usw2-1-ubuntu-workshop-${count.index}"
+    TTL = "72"
+    owner = "pphan@hashicorp.com"
+  }
+}
+
+# A security group for the ELB so it is accessible via the web
+resource "aws_security_group" "elb-sg" {
+  name        = "tf-${var.prefix}-${var.env}-sg"
+  description = "Used in the terraform"
+  vpc_id      = "${module.vpc_usw2-1.vpc_id}"
+  # HTTP access from anywhere
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  # outbound internet access
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# resource "aws_elb" "web" {
+#   name = "tf-${var.prefix}-${var.env}-example-elb"
+
+#   # The same availability zone as our instances
+#   subnets = "${module.vpc_usw2-1.public_subnets}"
+#   security_groups = [ "${aws_security_group.elb-sg.id}" ]
+
+#   listener {
+#     instance_port     = 80
+#     instance_protocol = "http"
+#     lb_port           = 80
+#     lb_protocol       = "http"
+#   }
+
+#   # The instances are registered automatically
+#   instances = "${aws_instance.vpc_usw2-1_pri_ubuntu.*.id}"
+# }
+

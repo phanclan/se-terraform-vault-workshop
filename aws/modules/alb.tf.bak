@@ -1,0 +1,67 @@
+resource "aws_lb" "alb" {
+  name = "tf-${var.prefix}-${var.env}-elb"
+  internal = false
+  load_balancer_type = "application"
+  subnets         = ["${module.vpc_usw2-1.public_subnets[0]}"]
+  security_groups = ["${aws_security_group.elb-sg.id}"]
+  instances       = "${aws_instance.vpc_usw2-1_pri_ubuntu.*.id}"
+
+  tags = {
+    Name = "tf-${var.prefix}-${var.env}-usw2-1-lb-workshop"
+    TTL = "72"
+    owner = "pphan@hashicorp.com"
+  }
+}
+
+resource "aws_lb_listener" "alb_listener" {  
+  load_balancer_arn = "${aws_alb.alb.arn}"  
+  # port              = "${var.alb_listener_port}"  
+  # protocol          = "${var.alb_listener_protocol}"
+  port = "80"
+  protocol = "tcp"
+  default_action {    
+    target_group_arn = "${aws_alb_target_group.alb_target.arn}"
+    type             = "forward"  
+  }
+}
+
+resource "aws_alb_listener_rule" "listener_rule" {
+  depends_on   = ["aws_alb_target_group.alb_target_group"]  
+  listener_arn = "${aws_alb_listener.alb_listener.arn}"  
+  priority     = "${var.priority}"   
+  action {    
+    type             = "forward"    
+    target_group_arn = "${aws_alb_target_group.alb_target_group.id}"  
+  }   
+  condition {    
+    field  = "path-pattern"    
+    values = ["${var.alb_path}"]  
+  }
+}
+
+resource "aws_alb_target_group" "alb_target_group" {  
+  # name     = "${var.target_group_name}"  
+  name = "tf-${var.prefix}-{$var.env}-target-group"
+  # port     = "${var.svc_port}"  
+  port = "80"
+  protocol = "HTTP"  
+  vpc_id   = "${module.vpc_usw2-1.vpc_id}"   
+  tags = {
+    Name = "tf-${var.prefix}-${var.env}-usw2-1-lb-workshop"
+    TTL = "72"
+    owner = "pphan@hashicorp.com"
+  }
+  stickiness {    
+    type            = "lb_cookie"    
+    cookie_duration = 1800    
+    enabled         = "${var.target_group_sticky}"  
+  }   
+  health_check {    
+    healthy_threshold   = 3    
+    unhealthy_threshold = 10    
+    timeout             = 5    
+    interval            = 10    
+    path                = "${var.target_group_path}"    
+    port                = "${var.target_group_port}"  
+  }
+}
