@@ -11,182 +11,140 @@
 a known working version. If you leave this out you'll get the latest
 version. */
 
+terraform { 
+  required_version = ">= 0.12.0"
+  backend "remote" {
+    organization = "phanpeterhc1"
+    workspaces {
+      name = "test"
+    }
+  }
+
+
+}
+
 provider "aws" {
-  version = "= 2.17.0"
+  # version = "= 2.17.0"
   region  = "${var.region}"
 }
 
-resource "aws_vpc" "workshop" {
-  cidr_block       = "${var.address_space}.0.0/16"
-  tags = {
-    Name = "${var.prefix}-workshop"
-    environment = "Production"
-  }
-}
-
-resource "aws_subnet" "subnet" {
-  vpc_id     = "${aws_vpc.workshop.id}"
-  availability_zone = "${var.region}a"
-  cidr_block = "${var.subnet_prefix}"
-
-  tags = {
-    Name = "${var.prefix}-workshop-subnet"
-  }
-}
-
-resource "aws_subnet" "subnet2" {
-  vpc_id     = "${aws_vpc.workshop.id}"
-  availability_zone = "${var.region}b"
-  cidr_block = "${var.address_space}.11.0/24"
-
-  tags = {
-    Name = "${var.prefix}-workshop-subnet"
-  }
-}
-
-resource "aws_internet_gateway" "main-gw" {
-    vpc_id = "${aws_vpc.workshop.id}"
-
-}
-
-resource "aws_route_table" "main-public" {
-    vpc_id = "${aws_vpc.workshop.id}"
-    route {
-        cidr_block = "0.0.0.0/0"
-        gateway_id = "${aws_internet_gateway.main-gw.id}"
-    }
-}
-
-resource "aws_route_table_association" "main-public-1-a" {
-    subnet_id = "${aws_subnet.subnet.id}"
-    route_table_id = "${aws_route_table.main-public.id}"
-}
-
-resource "aws_security_group" "vault-sg" {
-  name        = "${var.prefix}-sg"
-  description = "Vault Security Group"
-  vpc_id      = "${aws_vpc.workshop.id}"
-
-  ingress {
-    from_port   = 8200
-    to_port     = 8200
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 5000
-    to_port     = 5000
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-    cidr_blocks     = ["0.0.0.0/0"]
-  }
-}
-
-resource "aws_security_group" "mysql-workshop-sg" {
-  name        = "${var.prefix}-mysql-sg"
-  description = "Mysql Security Group"
-  vpc_id      = "${aws_vpc.workshop.id}"
-
-  ingress {
-    from_port   = 3306
-    to_port     = 3306
-    protocol    = "tcp"
-    cidr_blocks = ["10.0.0.0/8"]
-  }
-
-  egress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-    cidr_blocks     = ["0.0.0.0/0"]
-  }
-}
-
-data "aws_ami" "ubuntu" {
-    most_recent = true
-
-    filter {
-        name   = "name"
-        values = ["ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*"]
-    }
-
-    filter {
-        name   = "virtualization-type"
-        values = ["hvm"]
-    }
-
-    owners = ["099720109477"] # Canonical
-}
-
-resource "aws_key_pair" "tf_ec2_key" {
-  key_name = "${var.prefix}-tf_ec2_key"
-  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCjOXiqjoBMlfCBvmG6BcUGPv1q+YqNYLHlm6X18Frue+Yf2zG/56pMWtSoPbHKB+Nul0VNpANuOyt3qsEU+HtZz9MMTBiWL6kGH6S0saLMp7EpcZaib/Qxfkl1By6JnOwr6w7eW+XE4TXHRdBKaRWW4J52KdhlPXAeMFeSDL3qnZWaP7tIyKTQzdDXu0rSJIBpcYCVCQ5BkshWNvoVpDH0dH9r4ayLrzgnNzQHyqVFASU3DxqIAqrC3JflAz1aUWiwXhDJeZU3w6eDWvYxOAm+Z2vP5oiX/pqbYMlCUlPrsU5+6828kDQ5uQaZiCnSi2Bj3BDqpJngiVvyicJgvhW9 pephan@Mac-mini.local"
-#  public_key = "${file("~/.ssh/id_rsa.pub")}"
-}
-
-# module "ssh-keypair-aws" {
-#   source = "github.com/scarolan/ssh-keypair-aws"
-#   name   = "${var.prefix}-workshop"
+# resource "aws_vpc" "workshop" {
+#   cidr_block       = "${var.address_space}.0.0/16"
+#   tags = {
+#     Name = "${var.prefix}-workshop"
+#     environment = "Production"
+#   }
 # }
 
-# resource "aws_instance" "vault-server" {
-#   ami           = "${data.aws_ami.ubuntu.id}"
-#   instance_type = "${var.vm_size}"
-#   subnet_id     = "${aws_subnet.subnet.id}"
-#   vpc_security_group_ids = ["${aws_security_group.vault-sg.id}"]
-#   associate_public_ip_address = "true"
-#   key_name = "${module.ssh-keypair-aws.name}"
+# module "uw2" {
+#   source = "./modules/uw2"
+#   prefix = "${var.prefix}"
+#   env = "${var.env}"
+#   uw2-pub-net = "${var.uw2-pub-net}"
+#   uw2-pri-net = "${var.uw2-pri-net}"
+#   owner = "${var.owner}"
+#   address_space = "${var.address_space}"
+#   subnet_prefix = "${var.subnet_prefix}"
+#   key_name = "${var.prefix}-tf_ec2_key"
+# }
+
+# resource "aws_subnet" "subnet" {
+#   vpc_id     = "${aws_vpc.workshop.id}"
+#   availability_zone = "${var.region}a"
+#   cidr_block = "${var.subnet_prefix}"
+
 #   tags = {
-#     Name = "${var.prefix}-tf-workshop"
+#     Name = "${var.prefix}-workshop-subnet"
+#   }
+#   tags = {
+#     Name = "tf-${var.prefix}-${var.env}workshop"
 #     TTL = "72"
 #     owner = "team-se@hashicorp.com"
 #   }
-#   connection {
-#     type = "ssh"
-#     user = "ubuntu"
-#     private_key = "${module.ssh-keypair-aws.private_key_pem}"
-#     host = "${aws_instance.vault-server.public_ip}"
-#   }
+# }
 
-#   provisioner "file" {
-#     source      = "files/"
-#     destination = "/home/ubuntu/"
-#   }
+# resource "aws_subnet" "subnet2" {
+#   vpc_id     = "${aws_vpc.workshop.id}"
+#   availability_zone = "${var.region}b"
+#   cidr_block = "${var.address_space}.11.0/24"
 
-#   # Put a copy of the ssh key onto the local workstation
-#   provisioner "local-exec" {
-#     interpreter = ["PowerShell", "-Command"]
-#     command = <<-EOF
-#               New-Item -ItemType Directory -Force -Path $${env:HOMEPATH}\.ssh
-#               Write-Output @"
-#               ${module.ssh-keypair-aws.private_key_pem}
-#               "@ | Out-File $${env:HOMEPATH}\.ssh\id_rsa
-#               ((Get-Content $${env:HOMEPATH}\.ssh\id_rsa) -join "`n") + "`n" | Set-Content -NoNewline $${env:HOMEPATH}\.ssh\id_rsa
-#               EOF
-#   }
-
-#   provisioner "remote-exec" {
-#     inline = [
-#     "chmod -R +x /home/ubuntu/",
-#     "sleep 30",
-#     "MYSQL_ENDPOINT=${aws_db_instance.vault-demo.endpoint} MYSQL_HOST=${aws_db_instance.vault-demo.address} MYSQL_PORT=${aws_db_instance.vault-demo.port} /home/ubuntu/setup.sh"
-#     ]
+#   tags = {
+#     Name = "${var.prefix}-workshop-subnet"
 #   }
 # }
+
+# resource "aws_internet_gateway" "main-gw" {
+#     vpc_id = "${aws_vpc.workshop.id}"
+
+# }
+
+# resource "aws_route_table" "main-public" {
+#     vpc_id = "${aws_vpc.workshop.id}"
+#     route {
+#         cidr_block = "0.0.0.0/0"
+#         gateway_id = "${aws_internet_gateway.main-gw.id}"
+#     }
+# }
+
+# resource "aws_route_table_association" "main-public-1-a" {
+#     subnet_id = "${aws_subnet.subnet.id}"
+#     route_table_id = "${aws_route_table.main-public.id}"
+# }
+
+# resource "aws_security_group" "vault-sg" {
+#   name        = "${var.prefix}-sg"
+#   description = "Vault Security Group"
+#   vpc_id      = "${aws_vpc.workshop.id}"
+
+#   ingress {
+#     from_port   = 8200
+#     to_port     = 8200
+#     protocol    = "tcp"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+
+#   ingress {
+#     from_port   = 5000
+#     to_port     = 5000
+#     protocol    = "tcp"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+
+#   ingress {
+#     from_port   = 22
+#     to_port     = 22
+#     protocol    = "tcp"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+
+#   egress {
+#     from_port       = 0
+#     to_port         = 0
+#     protocol        = "-1"
+#     cidr_blocks     = ["0.0.0.0/0"]
+#   }
+# }
+
+# resource "aws_security_group" "mysql-workshop-sg" {
+#   name        = "${var.prefix}-mysql-sg"
+#   description = "Mysql Security Group"
+#   vpc_id      = "${aws_vpc.workshop.id}"
+
+#   ingress {
+#     from_port   = 3306
+#     to_port     = 3306
+#     protocol    = "tcp"
+#     cidr_blocks = ["10.0.0.0/8"]
+#   }
+
+#   egress {
+#     from_port       = 0
+#     to_port         = 0
+#     protocol        = "-1"
+#     cidr_blocks     = ["0.0.0.0/0"]
+#   }
+# }
+
 
 # resource "aws_db_subnet_group" "default" {
 #   name       = "${var.prefix}-subnet-group"
@@ -212,4 +170,17 @@ resource "aws_key_pair" "tf_ec2_key" {
 #   password             = "Password123!"
 #   parameter_group_name = "default.mysql5.7"
 #   vpc_security_group_ids = ["${aws_security_group.mysql-workshop-sg.id}"]
+# }
+
+# output "uw2_vault_pub_ip" {
+#   value = "${module.uw2.vault_pub_ip}"
+# }
+
+# output "uw2_pub_net_cidr" {
+#   value = "${module.uw2.uw2_pub_net_cidr}"
+# }
+
+
+# output "uw2_pub_net_cidr" {
+#   value = "${aws_subnet.pri_net.cidr_block}"
 # }

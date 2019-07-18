@@ -11,7 +11,7 @@ variable "prefix" {
 
 variable "region" {
   description = "The amazon region to use."
-  default     = "us-east-1"
+  default     = "us-west-2"
 }
 
 variable "address_space" {
@@ -28,3 +28,35 @@ variable "vm_size" {
   description = "Specifies the size of the virtual machine."
   default     = "t3.small"
 }
+
+variable "env" {
+  default = "dev"
+}
+
+variable "owner" {
+  default = "pphan"
+}
+
+variable "uw2-pub-net" {
+  default = "10.1.10.0/24"
+}
+
+variable "uw2-pri-net" {
+  default = "10.1.100.0/24"
+}
+
+variable "ue1-pub-net" {
+  default = "10.1.20.0/24"
+}
+
+variable "ue1-pri-net" {
+  default = "10.1.200.0/24"
+}
+
+# variable "key_name" {
+#   description = "key to use with instance"
+# }
+
+###################################
+#----- HashiStack Variables -----
+###################################

@@ -26,3 +26,40 @@
 # ssh ubuntu@${aws_instance.vault-server.public_ip}
 # EOF
 # }
+
+
+output "vpc_usw2-1_bastion_pub_ip" {
+  value = "${aws_instance.vpc_usw2-1_bastion.public_ip}"
+}
+# output "vpc_usw2-1_bastion_pub_fqdn" {
+#   value = "${aws_instance.vpc_usw2-1_bastion.public_dns}"
+# }
+
+# output "vpc_usw2-1_pri_ubuntu0" {
+#   value = "Instances: ${element(aws_instance.vpc_usw2-1_pri_ubuntu.*.id,0)}"
+# }
+# Using the new splat operator (*)
+output "vpc_usw2-1_pri_ubuntu" {
+  value = "${aws_instance.vpc_usw2-1_pri_ubuntu[*].private_ip}"
+}
+# New conditional expression with lists ()
+output "vpc_usw2-1_pri_ubuntu_new_cond" {
+  value = [
+    for instance in aws_instance.vpc_usw2-1_pri_ubuntu:
+    (instance.public_ip != "" ? list(instance.private_ip, instance.public_ip) : list(instance.private_ip))
+  ]
+}
+# New conditional expression with lists []
+output "vpc_usw2-1_pri_ubuntu_new_cond_brackets" {
+  value = [
+    for instance in aws_instance.vpc_usw2-1_pri_ubuntu:
+    (instance.public_ip != "" ? [instance.private_ip, instance.public_ip] : [instance.private_ip])
+  ]
+}
+# output "uw2_pub_net_cidr" {
+#   value = "${module.uw2.uw2_pub_net_cidr}"
+# }
+
+# output "uw2_pub_net_cidr" {
+#   value = "${aws_subnet.pri_net.cidr_block}"
+# }

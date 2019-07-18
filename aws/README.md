@@ -13,3 +13,11 @@ This repo contains Terraform code for standing up a HashiCorp Vault training lab
 
 ### Note for Instructors:
 If you're teaching this workshop to a class, head on over to the [Instructor Notes](../INSTRUCTOR_NOTES.md) page.
+
+
+
+# Miscellaneous Notes
+1. Bulk of phan configuration currently in vpc-usw2-1.tf
+1. security_groups replaced with vpc_security_group_ids
+1. "ssh-add" then "ssh -A <bastion>"
+1. troubleshoot your user_data execution. logs here /var/log/cloud-init-output.log
