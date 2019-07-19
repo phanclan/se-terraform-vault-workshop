@@ -122,6 +122,23 @@ data "template_file" "user_data" {
   }
 }
 
+data "template_file" "base_install" {
+  template = "${file("modules/templates/install-base.sh.tpl")}"
+}
+
+data "template_file" "vault_install" {
+  template = "${file("modules/templates/install-vault-systemd.sh.tpl")}"
+
+  vars = {
+    vault_version  = "${var.hashistack_vault_version}"
+    vault_url      = "${var.hashistack_vault_url}"
+    name           = "${var.name}"
+    local_ip_url   = "${var.local_ip_url}"
+    vault_override = "${var.vault_config_override != "" ? true : false}"
+    vault_config   = "${var.vault_config_override}"
+  }
+}
+
 resource "aws_instance" "vpc_usw2-1_bastion" {
   count = "${var.bastion_count}"
   ami           = "${data.aws_ami.ubuntu.id}"
@@ -154,7 +171,11 @@ resource "aws_instance" "vpc_usw2-1_pri_ubuntu" {
   ]
   key_name                    = "${aws_key_pair.tf_usw2_ec2_key.key_name}"
   private_ip                  = "10.10.11.1${count.index}"
-  user_data = "${data.template_file.user_data.rendered}"
+  user_data = <<EOF
+"${data.template_file.user_data.rendered}"
+${data.template_file.base_install.rendered} # Runtime install base tools
+${data.template_file.vault_install.rendered} # Runtime install Vault in -dev mode
+EOF
   # user_data                   = "${data.template_file.user_data.rendered}"
   # connection {
   #   user = "ubuntu"
