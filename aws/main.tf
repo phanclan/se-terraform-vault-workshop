@@ -13,14 +13,12 @@ version. */
 
 terraform { 
   required_version = ">= 0.12.0"
-  backend "remote" {
-    organization = "phanpeterhc1"
-    workspaces {
-      name = "test"
-    }
-  }
-
-
+  # backend "remote" {
+  #   organization = "phanpeterhc1"
+  #   workspaces {
+  #     name = "test"
+  #   }
+  # }
 }
 
 provider "aws" {

@@ -18,6 +18,8 @@ If you're teaching this workshop to a class, head on over to the [Instructor Not
 
 # Miscellaneous Notes
 1. Bulk of phan configuration currently in vpc-usw2-1.tf
+1. vpc-usw2-2.tf is used when two vpc's are needed in the same region.
+1. vpc-use1-1.tf is used when a VPC is needed in a different region.
 1. security_groups replaced with vpc_security_group_ids
 1. "ssh-add" then "ssh -A <bastion>"
 1. troubleshoot your user_data execution. logs here /var/log/cloud-init-output.log

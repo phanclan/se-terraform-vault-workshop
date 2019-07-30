@@ -67,6 +67,8 @@ variable "ue1-pri-net" { default = "10.1.200.0/24" }
 #------------------------------------------------
 #----- HashiStack Variables 
 #------------------------------------------------
+variable "name"         { default = "hashistack-dev" }
+variable "local_ip_url" { default = "http://169.254.169.254/latest/meta-data/local-ipv4" }
 
 variable "hashistack_servers"        { default = 1 }
 variable "hashistack_instance"       { default = "t2.micro" }
