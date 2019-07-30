@@ -30,7 +30,7 @@ module "vpc_usw2-1" {
   cidr = "${var.cidr}"
   azs = ["us-west-2a","us-west-2b"]
   public_subnets = "${var.public_subnets}"
-  # private_subnets     = "${var.public_subnets}"
+  private_subnets     = "${var.public_subnets}"
   enable_dns_hostnames = true
   enable_dns_support = true
   # enable_nat_gateway = true
