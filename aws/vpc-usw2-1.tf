@@ -7,10 +7,14 @@
 # 2. Bastion host, linux host
 # 3. A Linux server running HashiCorp Vault and a simple application
 
-# provider "aws" {
-#   region  = "${var.region}"
-# }
-
+locals {
+  common_tags = {
+    Owner       = "Peter Phan"
+    Environment = "${var.env}"
+    Name        = "tf-${var.prefix}-${var.env}-usw2-1"
+    TTL = "72"
+  }
+}
 resource "aws_key_pair" "tf_usw2_ec2_key" {
   key_name = "tf-${var.prefix}-${var.env}-usw2-ec2-key"
 #  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCjOXiqjoBMlfCBvmG6BcUGPv1q+YqNYLHlm6X18Frue+Yf2zG/56pMWtSoPbHKB+Nul0VNpANuOyt3qsEU+HtZz9MMTBiWL6kGH6S0saLMp7EpcZaib/Qxfkl1By6JnOwr6w7eW+XE4TXHRdBKaRWW4J52KdhlPXAeMFeSDL3qnZWaP7tIyKTQzdDXu0rSJIBpcYCVCQ5BkshWNvoVpDH0dH9r4ayLrzgnNzQHyqVFASU3DxqIAqrC3JflAz1aUWiwXhDJeZU3w6eDWvYxOAm+Z2vP5oiX/pqbYMlCUlPrsU5+6828kDQ5uQaZiCnSi2Bj3BDqpJngiVvyicJgvhW9 pephan@Mac-mini.local"
@@ -30,16 +34,12 @@ module "vpc_usw2-1" {
   cidr = "${var.cidr}"
   azs = ["us-west-2a","us-west-2b"]
   public_subnets = "${var.public_subnets}"
-  private_subnets     = "${var.public_subnets}"
+  private_subnets     = "${var.private_subnets}"
   enable_dns_hostnames = true
   enable_dns_support = true
   # enable_nat_gateway = true
   # single_nat_gateway = true
-  tags = {
-    Owner       = "Peter Phan"
-    Environment = "${var.env}"
-    Name        = "tf-${var.prefix}-${var.env}-usw2-1"
-  }
+  tags = local.common_tags
   igw_tags = { Name = "tf-${var.prefix}-${var.env}-usw2-1-IGW" }
   nat_gateway_tags = { Name = "tf-${var.prefix}-${var.env}-usw2-1-NGW"}
   public_route_table_tags = { Name = "tf-${var.prefix}-${var.env}-usw2-1-RT-public" }
@@ -95,11 +95,7 @@ resource "aws_security_group" "vpc_usw2-1_ping_ssh_sg" {
     protocol        = "-1"
     cidr_blocks     = ["0.0.0.0/0"]
   }
-  tags = {
-    Name = "tf-${var.prefix}-${var.env}-workshop"
-    TTL = "72"
-    owner = "pphan@hashicorp.com"
-  }
+  tags = local.common_tags
 }
 
 data "aws_ami" "ubuntu" {
@@ -125,6 +121,9 @@ data "template_file" "user_data" {
 data "template_file" "base_install" {
   template = "${file("modules/templates/install-base.sh.tpl")}"
 }
+data "template_file" "install_docker" {
+  template = "${file("modules/templates/install-docker.sh.tpl")}"
+}
 
 data "template_file" "vault_install" {
   template = "${file("modules/templates/install-vault-systemd.sh.tpl")}"
@@ -139,6 +138,24 @@ data "template_file" "vault_install" {
   }
 }
 
+data "template_cloudinit_config" "config" {
+  gzip          = true
+  base64_encode = true
+
+  # Main cloud-config configuration file.
+  part {
+    filename     = "user_data.tpl"
+    content_type = "text/cloud-config"
+    content      = "${data.template_file.user_data.rendered}"
+  }
+  # Docker cloud-config configuration file.
+  part {
+    filename     = "install-docker.sh.tpl"
+    content_type = "text/cloud-config"
+    content      = "${data.template_file.install_docker.rendered}"
+  }
+}
+
 resource "aws_instance" "vpc_usw2-1_bastion" {
   count = "${var.bastion_count}"
   ami           = "${data.aws_ami.ubuntu.id}"
@@ -148,14 +165,11 @@ resource "aws_instance" "vpc_usw2-1_bastion" {
   subnet_id                   = "${module.vpc_usw2-1.public_subnets[0]}"
   vpc_security_group_ids     = ["${aws_security_group.vpc_usw2-1_bastion_sg.id}", "${module.vpc_usw2-1.default_security_group_id}"]
   key_name                    = "${aws_key_pair.tf_usw2_ec2_key.key_name}"
-  user_data                   = "${data.template_file.user_data.rendered}"
+  # user_data                   = "${data.template_file.user_data.rendered}"
+  user_data_base64 = "${data.template_cloudinit_config.config.rendered}"
   private_ip                  = "10.10.1.10"
 
-  tags = {
-    Name = "tf-${var.prefix}-${var.env}-usw2-1-bastion-workshop"
-    TTL = "72"
-    owner = "pphan@hashicorp.com"
-  }
+  tags = local.common_tags
 }
 
 resource "aws_instance" "vpc_usw2-1_pri_ubuntu" {
@@ -189,11 +203,7 @@ EOF
   #     "sudo service nginx start",
   #   ]
   # }
-  tags = {
-    Name = "tf-${var.prefix}-${var.env}-usw2-1-ubuntu-workshop-${count.index}"
-    TTL = "72"
-    owner = "pphan@hashicorp.com"
-  }
+  tags = local.common_tags
 }
 
 # A security group for the ELB so it is accessible via the web
@@ -215,6 +225,7 @@ resource "aws_security_group" "elb-sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  tags = local.common_tags
 }
 
 # resource "aws_elb" "web" {

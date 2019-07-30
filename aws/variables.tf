@@ -41,7 +41,7 @@ variable "owner" {
 }
 
 variable "bastion_count" { default = "1" }
-variable "internal_vm_count" { default = "1"}
+variable "internal_vm_count" { default = "0"}
 
 #------------------------------------------------
 #----- Network Variables 

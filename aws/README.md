@@ -23,3 +23,5 @@ If you're teaching this workshop to a class, head on over to the [Instructor Not
 1. security_groups replaced with vpc_security_group_ids
 1. "ssh-add" then "ssh -A <bastion>"
 1. troubleshoot your user_data execution. logs here /var/log/cloud-init-output.log
+1. defined local for tags
+1. Moved provider configuration to provider.tf.
