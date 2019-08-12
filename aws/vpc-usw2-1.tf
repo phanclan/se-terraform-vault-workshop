@@ -43,7 +43,7 @@ module "vpc_usw2-1" {
   igw_tags = { Name = "tf-${var.prefix}-${var.env}-usw2-1-IGW" }
   nat_gateway_tags = { Name = "tf-${var.prefix}-${var.env}-usw2-1-NGW"}
   public_route_table_tags = { Name = "tf-${var.prefix}-${var.env}-usw2-1-RT-public" }
-  public_subnet_tags = { Name = "ctf-${var.prefix}-${var.env}-usw2-1-public" }
+  public_subnet_tags = { Name = "tf-${var.prefix}-${var.env}-usw2-1-public" }
   private_route_table_tags = { Name = "tf-${var.prefix}-${var.env}-usw2-1-RT-private" }
   private_subnet_tags = { Name = "tf-${var.prefix}-${var.env}-usw2-1-private" }
 }
