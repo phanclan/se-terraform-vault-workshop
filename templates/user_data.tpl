@@ -8,7 +8,7 @@ echo "<h1>Deployed via Terraform by ${prefix} - `hostname`</h1>" | sudo tee /var
 #VAULT_VERSION=
 
 # From https://github.com/phanclan/terraform-guides/blob/master/infrastructure-as-code/hashistack/templates/install-base.sh.tpl
-apt install -qq -y wget unzip dnsutils ruby rubygems ntp git nodejs npm nginx
+apt install -qq -y wget unzip dnsutils ruby rubygems ntp git nodejs npm nginx jq
 systemctl start ntp.service
 systemctl enable ntp.service
 echo "Disable reverse dns lookup in SSH"

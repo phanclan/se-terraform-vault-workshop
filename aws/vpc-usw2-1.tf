@@ -10,16 +10,16 @@
 locals {
   common_tags = {
     Owner       = "Peter Phan"
-    Environment = "${var.env}"
+    Environment = var.env
     Name        = "tf-${var.prefix}-${var.env}-usw2-1"
     TTL = "72"
   }
 }
 resource "aws_key_pair" "tf_usw2_ec2_key" {
   key_name = "tf-${var.prefix}-${var.env}-usw2-ec2-key"
-#  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCjOXiqjoBMlfCBvmG6BcUGPv1q+YqNYLHlm6X18Frue+Yf2zG/56pMWtSoPbHKB+Nul0VNpANuOyt3qsEU+HtZz9MMTBiWL6kGH6S0saLMp7EpcZaib/Qxfkl1By6JnOwr6w7eW+XE4TXHRdBKaRWW4J52KdhlPXAeMFeSDL3qnZWaP7tIyKTQzdDXu0rSJIBpcYCVCQ5BkshWNvoVpDH0dH9r4ayLrzgnNzQHyqVFASU3DxqIAqrC3JflAz1aUWiwXhDJeZU3w6eDWvYxOAm+Z2vP5oiX/pqbYMlCUlPrsU5+6828kDQ5uQaZiCnSi2Bj3BDqpJngiVvyicJgvhW9 pephan@Mac-mini.local"
-#  public_key = "${file("~/.ssh/id_rsa.pub")}"
-  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDhhEKJBWpUOHomxK6+8IJ7awT27/HfwG80PK+SrwAFaM4WhTg526etf5ksDpyjRQd3j1XDX9jVYUT5vTIaQ/YhqNVyaLM2ayY6GhAR+R+PIdpK1bhvfMvp6Rgsbii8PsD1HnKEJTOJayrhVY7W95mTUIGmCAWiIN1qrR04ffpfxNJdYcZdLbXu6DnT/EKJS9hQRgWLjQYSmJ0sOy4LeW7NqbDoOEunfzv8bX2dGbE4zn+ZpFSOAUC/VQTyxdkRPGiv3ocJyz+qbbSf7qCxYW61UX3K6Zdn/0ND8vqpl9xMvejPSk/4mIMNGuSrO8i/SzbgcM5ulS09KIw7GMoD6rwF peterphan@Peters-MacBook-Pro.local"
+  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCjOXiqjoBMlfCBvmG6BcUGPv1q+YqNYLHlm6X18Frue+Yf2zG/56pMWtSoPbHKB+Nul0VNpANuOyt3qsEU+HtZz9MMTBiWL6kGH6S0saLMp7EpcZaib/Qxfkl1By6JnOwr6w7eW+XE4TXHRdBKaRWW4J52KdhlPXAeMFeSDL3qnZWaP7tIyKTQzdDXu0rSJIBpcYCVCQ5BkshWNvoVpDH0dH9r4ayLrzgnNzQHyqVFASU3DxqIAqrC3JflAz1aUWiwXhDJeZU3w6eDWvYxOAm+Z2vP5oiX/pqbYMlCUlPrsU5+6828kDQ5uQaZiCnSi2Bj3BDqpJngiVvyicJgvhW9 pephan@Mac-mini.local"
+  # public_key = "${file("~/.ssh/id_rsa.pub")}"
+  # public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDhhEKJBWpUOHomxK6+8IJ7awT27/HfwG80PK+SrwAFaM4WhTg526etf5ksDpyjRQd3j1XDX9jVYUT5vTIaQ/YhqNVyaLM2ayY6GhAR+R+PIdpK1bhvfMvp6Rgsbii8PsD1HnKEJTOJayrhVY7W95mTUIGmCAWiIN1qrR04ffpfxNJdYcZdLbXu6DnT/EKJS9hQRgWLjQYSmJ0sOy4LeW7NqbDoOEunfzv8bX2dGbE4zn+ZpFSOAUC/VQTyxdkRPGiv3ocJyz+qbbSf7qCxYW61UX3K6Zdn/0ND8vqpl9xMvejPSk/4mIMNGuSrO8i/SzbgcM5ulS09KIw7GMoD6rwF peterphan@Peters-MacBook-Pro.local"
 }
 
 # module "ssh_keypair_aws" {
@@ -34,7 +34,7 @@ module "vpc_usw2-1" {
   cidr = "${var.cidr}"
   azs = ["us-west-2a","us-west-2b"]
   public_subnets = "${var.public_subnets}"
-  private_subnets     = "${var.private_subnets}"
+  #private_subnets     = "${var.private_subnets}"
   enable_dns_hostnames = true
   enable_dns_support = true
   # enable_nat_gateway = true
@@ -48,10 +48,10 @@ module "vpc_usw2-1" {
   private_subnet_tags = { Name = "tf-${var.prefix}-${var.env}-usw2-1-private" }
 }
 
-resource "aws_security_group" "vpc_usw2-1_bastion_sg" {
+resource "aws_security_group" "usw2-1_bastion_sg" {
   name        = "tf-${var.prefix}-${var.env}-bastion-sg"
   description = "Vault Security Group"
-  vpc_id      = "${module.vpc_usw2-1.vpc_id}"
+  vpc_id      = module.vpc_usw2-1.vpc_id
 
   ingress {
     from_port   = 22
@@ -59,22 +59,25 @@ resource "aws_security_group" "vpc_usw2-1_bastion_sg" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+  tags = local.common_tags
+}
+resource "aws_security_group" "egress_public_sg" {
+  name        = "tf-${var.prefix}-${var.env}-egress-public-sg"
+  description = "Allow outbound"
+  vpc_id      = module.vpc_usw2-1.vpc_id
   egress {
     from_port       = 0
     to_port         = 0
     protocol        = "-1"
     cidr_blocks     = ["0.0.0.0/0"]
   }
-  tags = {
-    Name = "tf-${var.prefix}-${var.env}-workshop"
-    TTL = "72"
-    owner = "team-se@hashicorp.com"
-  }
+  tags = local.common_tags
 }
 
+
 resource "aws_security_group" "vpc_usw2-1_ping_ssh_sg" {
-  name        = "tf_${var.prefix}_${var.env}_ping_ssh_sg"
-  # description = "Internal Security Group"
+  name        = "tf_${var.prefix}_${var.env}-ping-ssh-sg"
+  description = "Internal Security Group"
   vpc_id      = "${module.vpc_usw2-1.vpc_id}"
 
   ingress {
@@ -88,12 +91,6 @@ resource "aws_security_group" "vpc_usw2-1_ping_ssh_sg" {
     to_port     = -1
     protocol    = "icmp"
     cidr_blocks = ["0.0.0.0/0"]
-  }
-  egress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-    cidr_blocks     = ["0.0.0.0/0"]
   }
   tags = local.common_tags
 }
@@ -118,19 +115,29 @@ data "template_file" "user_data" {
   }
 }
 
-data "template_file" "base_install" {
+data "template_file" "install_base" {
   template = "${file("modules/templates/install-base.sh.tpl")}"
+  vars = {
+    prefix = "${var.prefix}"
+  }
 }
 data "template_file" "install_docker" {
   template = "${file("modules/templates/install-docker.sh.tpl")}"
 }
-
-data "template_file" "vault_install" {
-  template = "${file("modules/templates/install-vault-systemd.sh.tpl")}"
+data "template_file" "install_vault" {
+  template = "${file("modules/templates/install-vault.sh.tpl")}"
 
   vars = {
-    vault_version  = "${var.hashistack_vault_version}"
-    vault_url      = "${var.hashistack_vault_url}"
+    vault_version  = "${var.vault_version}"
+    vault_zip = "vault_${var.vault_version}_linux_amd64.zip"
+    vault_url      = "https://releases.hashicorp.com/vault/${var.vault_version}/vault_${var.vault_version}_linux_amd64.zip"
+    vault_dir      = "/usr/local/bin"
+    vault_path     = "/usr/local/bin/vault"
+    vault_config_dir  = "/etc/vault.d"
+    vault_data_dir    = "/opt/vault/data"
+    vault_tls_dir   = "/opt/vault/tls"
+    vault_env_vars = "/etc/vault.d/vault.conf"
+    vault_profile_script = "/etc/profile.d/vault.sh"
     name           = "${var.name}"
     local_ip_url   = "${var.local_ip_url}"
     vault_override = "${var.vault_config_override != "" ? true : false}"
@@ -138,35 +145,24 @@ data "template_file" "vault_install" {
   }
 }
 
-data "template_cloudinit_config" "config" {
-  gzip          = true
-  base64_encode = true
-
-  # Main cloud-config configuration file.
-  part {
-    filename     = "user_data.tpl"
-    content_type = "text/cloud-config"
-    content      = "${data.template_file.user_data.rendered}"
-  }
-  # Docker cloud-config configuration file.
-  part {
-    filename     = "install-docker.sh.tpl"
-    content_type = "text/cloud-config"
-    content      = "${data.template_file.install_docker.rendered}"
-  }
-}
-
-resource "aws_instance" "vpc_usw2-1_bastion" {
-  count = "${var.bastion_count}"
-  ami           = "${data.aws_ami.ubuntu.id}"
+resource "aws_instance" "usw2-1_bastion" {
+  count = var.bastion_count
+  ami           = data.aws_ami.ubuntu.id
   #ami                         = "${var.ubuntu_ami}"
-  instance_type               = "${var.vm_size}"
+  instance_type               = var.vm_size
   associate_public_ip_address = true
   subnet_id                   = "${module.vpc_usw2-1.public_subnets[0]}"
-  vpc_security_group_ids     = ["${aws_security_group.vpc_usw2-1_bastion_sg.id}", "${module.vpc_usw2-1.default_security_group_id}"]
-  key_name                    = "${aws_key_pair.tf_usw2_ec2_key.key_name}"
-  # user_data                   = "${data.template_file.user_data.rendered}"
-  user_data_base64 = "${data.template_cloudinit_config.config.rendered}"
+  vpc_security_group_ids     = ["${aws_security_group.usw2-1_bastion_sg.id}", 
+    "${aws_security_group.egress_public_sg.id}",
+    "${module.vpc_usw2-1.default_security_group_id}",
+  ]
+  key_name                    = aws_key_pair.tf_usw2_ec2_key.key_name
+  # key_name = module.ssh_keypair_aws.name
+  user_data = <<EOF
+${data.template_file.install_base.rendered} # Runtime install base tools
+${data.template_file.install_vault.rendered} # Install Vault
+${data.template_file.install_docker.rendered}
+EOF
   private_ip                  = "10.10.1.10"
 
   tags = local.common_tags
@@ -184,11 +180,11 @@ resource "aws_instance" "vpc_usw2-1_pri_ubuntu" {
     "${aws_security_group.elb-sg.id}"
   ]
   key_name                    = "${aws_key_pair.tf_usw2_ec2_key.key_name}"
+  # key_name = module.ssh_keypair_aws.name
   private_ip                  = "10.10.11.1${count.index}"
   user_data = <<EOF
-"${data.template_file.user_data.rendered}"
-${data.template_file.base_install.rendered} # Runtime install base tools
-${data.template_file.vault_install.rendered} # Runtime install Vault in -dev mode
+${data.template_file.install_base.rendered} # Runtime install base tools
+${data.template_file.install_vault.rendered} # Runtime install Vault in -dev mode
 EOF
   # user_data                   = "${data.template_file.user_data.rendered}"
   # connection {

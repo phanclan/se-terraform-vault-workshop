@@ -8,13 +8,16 @@
 #------------------------------------------------
 #----- General Variables 
 #------------------------------------------------
-variable "prefix" {
-  description = "This prefix will be included in the name of most resources."
-}
+variable "bastion_count" { default = "0" }
+variable "internal_vm_count" { default = "0"}
 
 variable "region" {
   description = "The amazon region to use."
   default     = "us-west-2"
+}
+variable "vm_size" {
+  description = "Specifies the size of the virtual machine."
+  default     = "t3.small"
 }
 
 variable "address_space" {
@@ -22,16 +25,15 @@ variable "address_space" {
   default     = "10.1"
 }
 
-variable "subnet_prefix" {
-  description = "The address prefix to use for the subnet."
-  default     = "10.1.10.0/24"
-}
+# variable "subnet_prefix" {
+#   description = "The address prefix to use for the subnet."
+#   default     = "10.1.10.0/24"
+# }
 
-variable "vm_size" {
-  description = "Specifies the size of the virtual machine."
-  default     = "t3.small"
-}
 
+variable "prefix" {
+  description = "This prefix will be included in the name of most resources."
+}
 variable "env" {
   default = "dev"
 }
@@ -40,8 +42,6 @@ variable "owner" {
   default = "pphan"
 }
 
-variable "bastion_count" { default = "1" }
-variable "internal_vm_count" { default = "0"}
 
 #------------------------------------------------
 #----- Network Variables 
@@ -55,10 +55,10 @@ variable "private_subnets" {
 }
 
 # the following four variables were before modules
-variable "uw2-pub-net" { default = "10.1.10.0/24" }
-variable "uw2-pri-net" { default = "10.1.100.0/24" }
-variable "ue1-pub-net" { default = "10.1.20.0/24" }
-variable "ue1-pri-net" { default = "10.1.200.0/24" }
+# variable "uw2-pub-net" { default = "10.1.10.0/24" }
+# variable "uw2-pri-net" { default = "10.1.100.0/24" }
+# variable "ue1-pub-net" { default = "10.1.20.0/24" }
+# variable "ue1-pri-net" { default = "10.1.200.0/24" }
 
 # variable "key_name" {
 #   description = "key to use with instance"
@@ -73,10 +73,11 @@ variable "local_ip_url" { default = "http://169.254.169.254/latest/meta-data/loc
 variable "hashistack_servers"        { default = 1 }
 variable "hashistack_instance"       { default = "t2.micro" }
 variable "hashistack_consul_version" { default = "1.2.3" }
-variable "hashistack_vault_version"  { default = "0.11.3" }
+variable "vault_version"  { default = "1.2.0" }
 variable "hashistack_nomad_version"  { default = "0.8.6" }
 variable "hashistack_consul_url"     { default = "" }
-variable "hashistack_vault_url"      { default = "" }
+variable "vault_url"      { default = "" }
+# variable "vault_zip" { default = ""}
 variable "hashistack_nomad_url"      { default = "" }
 variable "hashistack_image_id"       { default = "" }
 
