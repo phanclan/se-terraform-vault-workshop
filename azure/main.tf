@@ -149,7 +149,7 @@ resource "azurerm_virtual_machine" "vault" {
 
   storage_os_disk {
     name              = "${var.prefix}-osdisk"
-    managed_disk_type = "Standard_LRS"
+    managed_disk_type = "StandardSSD_LRS"
     caching           = "ReadWrite"
     create_option     = "FromImage"
   }
