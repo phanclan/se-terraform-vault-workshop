@@ -39,7 +39,7 @@ module "uw1" {
   uw1-pub-net = "${var.uw1-pub-net}"
   uw1-pri-net = "${var.uw1-pri-net}"
   owner       = "${var.owner}"
-  vault_count = "1"
+  vault_count = "0"
 }
 
 # module "ue1" {
