@@ -7,11 +7,12 @@
 
 variable "prefix" {
   description = "This prefix will be included in the name of most resources."
+  default = "phan"
 }
 
 variable "location" {
   description = "The region where the virtual network is created."
-  default     = "centralus"
+  default     = "westus"
 }
 
 variable "address_space" {
@@ -48,26 +49,25 @@ variable "ssh_source_ips" {
   description = "Valid CIDR range for allowed source IPs to access SSH."
   default     = "0.0.0.0/0"
 }
-
+#------------------------------------------------------------------------------
+# IMAGE VARIABLES
 variable "image_publisher" {
   description = "Name of the publisher of the image (az vm image list)"
   default     = "Canonical"
 }
-
 variable "image_offer" {
   description = "Name of the offer (az vm image list)"
   default     = "UbuntuServer"
 }
-
 variable "image_sku" {
   description = "Image SKU to apply (az vm image list)"
-  default     = "16.04-LTS"
+  default     = "18.04-LTS"
 }
-
 variable "image_version" {
   description = "Version of the image to apply (az vm image list)"
   default     = "latest"
 }
+#------------------------------------------------------------------------------
 
 variable "admin_username" {
   description = "Administrator user name for linux and mysql"
