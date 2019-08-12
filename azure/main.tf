@@ -143,16 +143,6 @@ every time. */
 #   collation           = "utf8_unicode_ci"
 # }
 
-/* Public IP addresses are not generated until they are attached to an object.
-So we use a 'data source' here to fetch it once its available. Then we can
-provide the public IP address to the next resource for allowing firewall 
-access to our database. */
-
-data "azurerm_public_ip" "vault-pip" {
-  name                = "${azurerm_public_ip.vault-pip.name}"
-  depends_on          = ["azurerm_virtual_machine.vault"]
-  resource_group_name = "${azurerm_virtual_machine.vault.resource_group_name}"
-}
 
 /* Allows the Linux VM to connect to the MySQL database, using the IP address
 from the data source above. */
