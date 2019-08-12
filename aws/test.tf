@@ -8,7 +8,7 @@ resource "local_file" "kubeconfig" {
 }
 data "template_file" "init" {
   # count = "${length(split(",", var.names))}"
-  template = "${file("modules/templates/test.tpl")}"
+  template = "${file("../templates/test.tpl")}"
   vars = {
     test = "${var.names}"
   }
