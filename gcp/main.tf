@@ -13,7 +13,7 @@
 #--------------------------------------------------------------------------------------------------
 
 provider "google" {
-  credentials = "${file("~/.gcp/CRED_FILE.json")}"
+  # credentials = "${file("~/.gcp/CRED_FILE.json")}"
   project     = var.gcp-project
   #version = = "2.10" # Pin the version or you get the latest
   # region  = var.region
