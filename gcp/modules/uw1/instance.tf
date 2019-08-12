@@ -45,7 +45,7 @@ resource "google_compute_instance" "vault-server" {
   metadata_startup_script = data.template_file.init.rendered
 
   metadata = {
-    ssh-keys = "ubuntu:${file("~/.ssh/id_rsa.pub")}"
+    ssh-keys = "ubuntu:${var.public_key}"
   #   startup_script = <<EOF
   #   apt-get -y update
   #   apt-get -y install apach2 wget curl
