@@ -122,10 +122,10 @@ data "template_file" "install_base" {
   }
 }
 data "template_file" "install_docker" {
-  template = "${file("modules/templates/install-docker.sh.tpl")}"
+  template = "${file("../templates/install-docker.sh.tpl")}"
 }
 data "template_file" "install_vault" {
-  template = "${file("modules/templates/install-vault.sh.tpl")}"
+  template = "${file("../templates/install-vault.sh.tpl")}"
 
   vars = {
     vault_version  = "${var.vault_version}"
