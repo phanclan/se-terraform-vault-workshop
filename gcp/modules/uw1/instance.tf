@@ -108,7 +108,7 @@ resource "google_compute_instance" "dbserver" {
   metadata = {
     # startup-script-url = "${var.db_startup_script_bucket}"
     # serial-port-enable = true
-    ssh-keys = "pphan:${file("~/.ssh/id_rsa.pub")}"
+    ssh-keys = "pphan:${var.public_key}"
     # sshKeys                              = "${var.public_key}"
   }
 
