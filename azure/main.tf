@@ -131,66 +131,66 @@ We use the shell provisioner to run a Bash script that configures Vault for
 the demo environment. Terraform supports several different types of 
 provisioners including Bash, Powershell and Chef. */
 
-resource "azurerm_virtual_machine" "vault" {
-  name                = "${var.prefix}-vault"
-  location            = "${var.location}"
-  resource_group_name = "${azurerm_resource_group.hashitraining.name}"
-  vm_size             = "${var.vm_size}"
+# resource "azurerm_virtual_machine" "vault" {
+#   name                = "${var.prefix}-vault"
+#   location            = "${var.location}"
+#   resource_group_name = "${azurerm_resource_group.hashitraining.name}"
+#   vm_size             = "${var.vm_size}"
 
-  network_interface_ids         = ["${azurerm_network_interface.vault-nic.id}"]
-  delete_os_disk_on_termination = "true"
+#   network_interface_ids         = ["${azurerm_network_interface.vault-nic.id}"]
+#   delete_os_disk_on_termination = "true"
 
-  storage_image_reference {
-    publisher = "${var.image_publisher}"
-    offer     = "${var.image_offer}"
-    sku       = "${var.image_sku}"
-    version   = "${var.image_version}"
-  }
+#   storage_image_reference {
+#     publisher = "${var.image_publisher}"
+#     offer     = "${var.image_offer}"
+#     sku       = "${var.image_sku}"
+#     version   = "${var.image_version}"
+#   }
 
-  storage_os_disk {
-    name              = "${var.prefix}-osdisk"
-    managed_disk_type = "StandardSSD_LRS"
-    caching           = "ReadWrite"
-    create_option     = "FromImage"
-  }
+#   storage_os_disk {
+#     name              = "${var.prefix}-osdisk"
+#     managed_disk_type = "StandardSSD_LRS"
+#     caching           = "ReadWrite"
+#     create_option     = "FromImage"
+#   }
 
-  os_profile {
-    computer_name  = "${var.prefix}"
-    admin_username = "${var.admin_username}"
-    admin_password = "${var.admin_password}"
-  }
+#   os_profile {
+#     computer_name  = "${var.prefix}"
+#     admin_username = "${var.admin_username}"
+#     admin_password = "${var.admin_password}"
+#   }
 
-  os_profile_linux_config {
-    disable_password_authentication = false
-  }
+#   os_profile_linux_config {
+#     disable_password_authentication = false
+#   }
 
-   provisioner "file" {
-     source      = "files/"
-     destination = "/home/${var.admin_username}/"
+#    provisioner "file" {
+#      source      = "files/"
+#      destination = "/home/${var.admin_username}/"
 
-     connection {
-       type     = "ssh"
-       user     = "${var.admin_username}"
-       password = "${var.admin_password}"
-       host     = "${azurerm_public_ip.vault-pip.fqdn}"
-     }
-   }
+#      connection {
+#        type     = "ssh"
+#        user     = "${var.admin_username}"
+#        password = "${var.admin_password}"
+#        host     = "${azurerm_public_ip.vault-pip.fqdn}"
+#      }
+#    }
 
-  provisioner "remote-exec" {
-    inline = [
-      "chmod -R +x /home/${var.admin_username}/*",
-      "sleep 30",
-      "MYSQL_HOST=${var.prefix}-mysql-server /home/${var.admin_username}/setup.sh"
-    ]
+#   provisioner "remote-exec" {
+#     inline = [
+#       "chmod -R +x /home/${var.admin_username}/*",
+#       "sleep 30",
+#       "MYSQL_HOST=${var.prefix}-mysql-server /home/${var.admin_username}/setup.sh"
+#     ]
 
-    connection {
-      type     = "ssh"
-      user     = "${var.admin_username}"
-      password = "${var.admin_password}"
-      host     = "${azurerm_public_ip.vault-pip.fqdn}"
-    }
-  }
-}
+#     connection {
+#       type     = "ssh"
+#       user     = "${var.admin_username}"
+#       password = "${var.admin_password}"
+#       host     = "${azurerm_public_ip.vault-pip.fqdn}"
+#     }
+#   }
+# }
 
 /* Azure MySQL Database
 Vault will manage this database with the database secrets engine.
