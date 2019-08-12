@@ -15,14 +15,6 @@ provider "azurerm" {
   # version = "=1.30.1"
 }
 
-/* First we'll create a resource group. In Azure every resource belongs to a 
-resource group. Think of it as a container to hold all your resources. 
-You can find a complete list of Azure resources supported by Terraform here:
-https://www.terraform.io/docs/providers/azurerm/. Note the use of variables 
-to dynamically set our name and location. Variables are usually defined in 
-the variables.tf file, and you can override the defaults in your 
-own terraform.tfvars file. */ 
-
 resource "azurerm_resource_group" "hashitraining" {
   name     = "${var.prefix}-workshop"
   location = "${var.location}"
@@ -207,29 +199,29 @@ Azure offers managed MySQL database servers and a whole host of other
 resources. Each resource is documented with all the available settings:
 https://www.terraform.io/docs/providers/azurerm/r/mysql_server.html */
 
-resource "azurerm_mysql_server" "mysql" {
-  name                = "${var.prefix}-mysql-server"
-  location            = "${azurerm_resource_group.hashitraining.location}"
-  resource_group_name = "${azurerm_resource_group.hashitraining.name}"
-  ssl_enforcement     = "Disabled"
+# resource "azurerm_mysql_server" "mysql" {
+#   name                = "${var.prefix}-mysql-server"
+#   location            = "${azurerm_resource_group.hashitraining.location}"
+#   resource_group_name = "${azurerm_resource_group.hashitraining.name}"
+#   ssl_enforcement     = "Disabled"
 
-  sku {
-    name     = "B_Gen5_2"
-    capacity = 2
-    tier     = "Basic"
-    family   = "Gen5"
-  }
+#   sku {
+#     name     = "B_Gen5_2"
+#     capacity = 2
+#     tier     = "Basic"
+#     family   = "Gen5"
+#   }
 
-  storage_profile {
-    storage_mb            = 5120
-    backup_retention_days = 7
-    geo_redundant_backup  = "Disabled"
-  }
+#   storage_profile {
+#     storage_mb            = 5120
+#     backup_retention_days = 7
+#     geo_redundant_backup  = "Disabled"
+#   }
 
-  administrator_login          = "${var.admin_username}"
-  administrator_login_password = "${var.admin_password}"
-  version                      = "5.7"
-}
+#   administrator_login          = "${var.admin_username}"
+#   administrator_login_password = "${var.admin_password}"
+#   version                      = "5.7"
+# }
 
 /* This is a sample database that we'll populate with data from our app.
 With Terraform, everything is Infrastructure as Code. No more manual steps,
@@ -237,13 +229,13 @@ aging runbooks, tribal knowledge or outdated wiki instructions. Terraform
 is your executable documentation, and it will build infrastructure correctly
 every time. */
 
-resource "azurerm_mysql_database" "wsmysqldatabase" {
-  name                = "wsmysqldatabase"
-  resource_group_name = "${azurerm_resource_group.hashitraining.name}"
-  server_name         = "${azurerm_mysql_server.mysql.name}"
-  charset             = "utf8"
-  collation           = "utf8_unicode_ci"
-}
+# resource "azurerm_mysql_database" "wsmysqldatabase" {
+#   name                = "wsmysqldatabase"
+#   resource_group_name = "${azurerm_resource_group.hashitraining.name}"
+#   server_name         = "${azurerm_mysql_server.mysql.name}"
+#   charset             = "utf8"
+#   collation           = "utf8_unicode_ci"
+# }
 
 /* Public IP addresses are not generated until they are attached to an object.
 So we use a 'data source' here to fetch it once its available. Then we can
@@ -259,10 +251,10 @@ data "azurerm_public_ip" "vault-pip" {
 /* Allows the Linux VM to connect to the MySQL database, using the IP address
 from the data source above. */
 
-resource "azurerm_mysql_firewall_rule" "vault-mysql" {
-  name                = "vault-mysql"
-  resource_group_name = "${azurerm_resource_group.hashitraining.name}"
-  server_name         = "${azurerm_mysql_server.mysql.name}"
-  start_ip_address    = "${data.azurerm_public_ip.vault-pip.ip_address}"
-  end_ip_address      = "${data.azurerm_public_ip.vault-pip.ip_address}"
-}
+# resource "azurerm_mysql_firewall_rule" "vault-mysql" {
+#   name                = "vault-mysql"
+#   resource_group_name = "${azurerm_resource_group.hashitraining.name}"
+#   server_name         = "${azurerm_mysql_server.mysql.name}"
+#   start_ip_address    = "${data.azurerm_public_ip.vault-pip.ip_address}"
+#   end_ip_address      = "${data.azurerm_public_ip.vault-pip.ip_address}"
+# }
