@@ -109,14 +109,14 @@ data "aws_ami" "ubuntu" {
 }
 
 data "template_file" "user_data" {
-  template = "${file("modules/templates/user_data.tpl")}"
+  template = "${file("../templates/user_data.tpl")}"
   vars = {
     prefix = "${var.prefix}"
   }
 }
 
 data "template_file" "install_base" {
-  template = "${file("modules/templates/install-base.sh.tpl")}"
+  template = "${file("../templates/install-base.sh.tpl")}"
   vars = {
     prefix = "${var.prefix}"
   }
