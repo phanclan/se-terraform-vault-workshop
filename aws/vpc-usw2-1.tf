@@ -144,7 +144,7 @@ data "template_file" "install_vault" {
     vault_config         = "${var.vault_config_override}"
   }
 }
-data "template_file" "install-hashi" {
+data "template_file" "install_hashi" {
   template = "${file("${path.root}/../templates/install-hashi.sh.tpl")}"
   vars = {
     TF_VERSION = var.TF_VERSION
