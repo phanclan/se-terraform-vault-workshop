@@ -13,7 +13,7 @@ variable "region" {
   description = "The amazon region to use."
   default     = "us-west-2"
 }
-
+variable "vpc_id" {}
 variable "vm_size" {
   default     = "t3.small"
 }

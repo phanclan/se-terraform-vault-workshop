@@ -2,7 +2,7 @@
 resource "aws_security_group" "elb-sg" {
   name = "${var.name_prefix}-sg"
   description = "Used in the terraform"
-  vpc_id = "${module.vpc_usw2-1.vpc_id}"
+  vpc_id = var.vpc_id
   # HTTP access from anywhere
   ingress {
     from_port = 80
