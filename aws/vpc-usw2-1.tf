@@ -207,7 +207,7 @@ EOF
 }
 
 module "usw2-1_elb" {
-  source      = "./modules/uw2"
+  source      = "./modules/elb"
   name_prefix = local.name_prefix
   vpc_id      = module.vpc_usw2-1.vpc_id
 }
