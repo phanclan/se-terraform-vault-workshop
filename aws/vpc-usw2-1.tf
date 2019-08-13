@@ -206,7 +206,7 @@ resource "aws_instance" "vpc_usw2-1_pri_ubuntu" {
   private_ip = "10.10.11.1${count.index}"
   user_data = <<EOF
 ${data.template_file.install_base.rendered} # Runtime install base tools
-${data.template_file.install_vault.rendered} # Runtime install Vault in -dev mode
+${data.template_file.install_hashi.rendered} # Runtime install Vault in -dev mode
 EOF
   # connection {
   #   user = "ubuntu"
