@@ -49,7 +49,7 @@ output "usw2-1_pri_ubuntu" {
 #     for instance in module.usw2-1_pri_ubuntu :
 #     (instance.public_ip != "" ? list(instance.private_ip, instance.public_ip) : list(instance.private_ip))
 #   ]
-}
+# }
 # New conditional expression with lists []
 # output "vpc_usw2-1_pri_ubuntu_new_cond_brackets" {
 #   value = [
