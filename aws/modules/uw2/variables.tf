@@ -7,6 +7,7 @@
 # prompted to enter it (or define it via config file or command line flags.)
 
 variable "prefix" {}
+variable "name_prefix" {}
 
 variable "region" {
   description = "The amazon region to use."
