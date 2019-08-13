@@ -98,6 +98,7 @@ resource "aws_security_group" "vpc_usw2-1_ping_ssh_sg" {
 
 data "aws_ami" "ubuntu" {
   most_recent = true
+  owners = ["099720109477"] # Canonical
   filter {
     name   = "name"
     values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
@@ -106,7 +107,6 @@ data "aws_ami" "ubuntu" {
     name   = "virtualization-type"
     values = ["hvm"]
   }
-  owners = ["099720109477"] # Canonical
 }
 
 data "template_file" "user_data" {
@@ -125,9 +125,8 @@ data "template_file" "install_base" {
 data "template_file" "install_docker" {
   template = "${file("../templates/install-docker.sh.tpl")}"
 }
-data "template_file" "install_vault" {
-  template = "${file("../templates/install-vault.sh.tpl")}"
-
+data "template_file" "install_hashi" {
+  template = "${file("../templates/install-hashi.sh.tpl")}"
   vars = {
     vault_version        = "${var.vault_version}"
     vault_zip            = "vault_${var.vault_version}_linux_amd64.zip"
@@ -164,16 +163,32 @@ resource "aws_instance" "usw2-1_bastion" {
   # key_name = module.ssh_keypair_aws.name
   user_data = <<EOF
 ${data.template_file.install_base.rendered} # Runtime install base tools
-${data.template_file.install_vault.rendered} # Install Vault
+${data.template_file.install_hashi.rendered} # Install Vault
 ${data.template_file.install_docker.rendered}
 EOF
   private_ip = "10.10.1.10"
 
   tags = local.common_tags
 }
-# module "usw2-1_bastion" {
-#   source = "terraform-aws-modules/ec2-instance/"
-# }
+module "usw2-1_bastion" {
+  source = "terraform-aws-modules/ec2-instance/aws"
+  instance_count = 1
+  name = "phan" # name_prefix
+  ami = data.aws_ami.ubuntu.id
+  instance_type = var.vm_size
+  subnet_id = module.vpc_usw2-1.public_subnets[0]
+  vpc_security_group_ids = ["${aws_security_group.usw2-1_bastion_sg.id}",
+    "${aws_security_group.egress_public_sg.id}",
+    "${module.vpc_usw2-1.default_security_group_id}",
+  ]
+  associate_public_ip_address = true
+  private_ip = "10.10.1.10"
+  user_data = <<EOF
+${data.template_file.install_base.rendered} # Runtime install base tools
+${data.template_file.install_hashi.rendered} # Install Hashi Suite
+EOF
+  tags = local.common_tags
+}
 
 resource "aws_instance" "vpc_usw2-1_pri_ubuntu" {
   count = "${var.internal_vm_count}"
