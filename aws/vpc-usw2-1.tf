@@ -210,4 +210,6 @@ module "usw2-1_elb" {
   source      = "./modules/elb"
   name_prefix = local.name_prefix
   vpc_id      = module.vpc_usw2-1.vpc_id
+  subnets     = module.vpc_usw2-1.public_subnets
+  instances   = module.usw2-1_pri_ubuntu.*.id
 }

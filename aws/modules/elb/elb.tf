@@ -1,6 +1,6 @@
 #--- A security group for the ELB so it is accessible via the web
 resource "aws_security_group" "elb-sg" {
-  name = "${var.name_prefix}-sg"
+  name = "${var.name_prefix}-elb-sg"
   description = "Used in the terraform"
   vpc_id = var.vpc_id
   # HTTP access from anywhere
@@ -17,7 +17,7 @@ resource "aws_security_group" "elb-sg" {
     protocol = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  # tags = local.common_tags
+  tags = local.common_tags
 }
 output "elb-sg-id" {
   value = aws_security_group.elb-sg.id
@@ -26,21 +26,21 @@ output "elb-sg-id" {
 # Configuration for ELB. Uncomment if desired.
 #------------------------------------------------------------------------------
 
-# resource "aws_elb" "web" {
-#   name = "${var.name_prefix}-example-elb"
+resource "aws_elb" "web" {
+  name = "${var.name_prefix}-example-elb"
 
-#   # The same availability zone as our instances
-#   subnets = "${module.vpc_usw2-1.public_subnets}"
-#   security_groups = [ "${aws_security_group.elb-sg.id}" ]
+  # The same availability zone as our instances
+  subnets = var.public_subnets
+  security_groups = [ "${aws_security_group.elb-sg.id}" ]
 
-#   listener {
-#     instance_port     = 80
-#     instance_protocol = "http"
-#     lb_port           = 80
-#     lb_protocol       = "http"
-#   }
+  listener {
+    instance_port     = 80
+    instance_protocol = "http"
+    lb_port           = 80
+    lb_protocol       = "http"
+  }
 
-#   # The instances are registered automatically
-#   instances = "${aws_instance.vpc_usw2-1_pri_ubuntu.*.id}"
-# }
+  # The instances are registered automatically
+  instances = var.instances.id
+}
 
