@@ -212,4 +212,5 @@ module "usw2-1_elb" {
   vpc_id      = module.vpc_usw2-1.vpc_id
   subnets     = module.vpc_usw2-1.public_subnets
   instances   = module.usw2-1_pri_ubuntu.*.id
+  common_tags        = local.common_tags
 }

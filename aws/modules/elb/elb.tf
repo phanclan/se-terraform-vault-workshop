@@ -17,7 +17,7 @@ resource "aws_security_group" "elb-sg" {
     protocol = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-  tags = local.common_tags
+  tags = var.common_tags
 }
 output "elb-sg-id" {
   value = aws_security_group.elb-sg.id
