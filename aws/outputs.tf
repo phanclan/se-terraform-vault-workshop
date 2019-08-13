@@ -44,19 +44,19 @@ output "usw2-1_pri_ubuntu" {
   # value = "${aws_instance.vpc_usw2-1_pri_ubuntu[*].private_ip}"
 }
 # New conditional expression with lists ()
-output "vpc_usw2-1_pri_ubuntu_new_cond" {
-  value = [
-    for instance in module.usw2-1_pri_ubuntu :
-    (instance.public_ip != "" ? list(instance.private_ip, instance.public_ip) : list(instance.private_ip))
-  ]
+# output "vpc_usw2-1_pri_ubuntu_new_cond" {
+#   value = [
+#     for instance in module.usw2-1_pri_ubuntu :
+#     (instance.public_ip != "" ? list(instance.private_ip, instance.public_ip) : list(instance.private_ip))
+#   ]
 }
 # New conditional expression with lists []
-output "vpc_usw2-1_pri_ubuntu_new_cond_brackets" {
-  value = [
-    for instance in module.usw2-1_pri_ubuntu :
-    (instance.public_ip != "" ? [instance.private_ip, instance.public_ip] : [instance.private_ip])
-  ]
-}
+# output "vpc_usw2-1_pri_ubuntu_new_cond_brackets" {
+#   value = [
+#     for instance in module.usw2-1_pri_ubuntu :
+#     (instance.public_ip != "" ? [instance.private_ip, instance.public_ip] : [instance.private_ip])
+#   ]
+# }
 # output "uw2_pub_net_cidr" {
 #   value = "${module.uw2.uw2_pub_net_cidr}"
 # }
