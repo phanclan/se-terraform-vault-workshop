@@ -30,7 +30,7 @@ resource "aws_elb" "web" {
   name = "${var.name_prefix}-example-elb"
 
   # The same availability zone as our instances
-  subnets = var.public_subnets
+  subnets = var.subnets
   security_groups = [ "${aws_security_group.elb-sg.id}" ]
 
   listener {
