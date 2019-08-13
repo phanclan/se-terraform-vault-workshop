@@ -12,11 +12,11 @@ locals {
     Owner       = "Peter Phan"
     Environment = var.env
     Name        = "tf-${var.prefix}-${var.env}-usw2-1"
-    TTL = "72"
+    TTL         = "72"
   }
 }
 resource "aws_key_pair" "tf_usw2_ec2_key" {
-  key_name = "tf-${var.prefix}-${var.env}-usw2-ec2-key"
+  key_name   = "tf-${var.prefix}-${var.env}-usw2-ec2-key"
   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCjOXiqjoBMlfCBvmG6BcUGPv1q+YqNYLHlm6X18Frue+Yf2zG/56pMWtSoPbHKB+Nul0VNpANuOyt3qsEU+HtZz9MMTBiWL6kGH6S0saLMp7EpcZaib/Qxfkl1By6JnOwr6w7eW+XE4TXHRdBKaRWW4J52KdhlPXAeMFeSDL3qnZWaP7tIyKTQzdDXu0rSJIBpcYCVCQ5BkshWNvoVpDH0dH9r4ayLrzgnNzQHyqVFASU3DxqIAqrC3JflAz1aUWiwXhDJeZU3w6eDWvYxOAm+Z2vP5oiX/pqbYMlCUlPrsU5+6828kDQ5uQaZiCnSi2Bj3BDqpJngiVvyicJgvhW9 pephan@Mac-mini.local"
   # public_key = "${file("~/.ssh/id_rsa.pub")}"
   # public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDhhEKJBWpUOHomxK6+8IJ7awT27/HfwG80PK+SrwAFaM4WhTg526etf5ksDpyjRQd3j1XDX9jVYUT5vTIaQ/YhqNVyaLM2ayY6GhAR+R+PIdpK1bhvfMvp6Rgsbii8PsD1HnKEJTOJayrhVY7W95mTUIGmCAWiIN1qrR04ffpfxNJdYcZdLbXu6DnT/EKJS9hQRgWLjQYSmJ0sOy4LeW7NqbDoOEunfzv8bX2dGbE4zn+ZpFSOAUC/VQTyxdkRPGiv3ocJyz+qbbSf7qCxYW61UX3K6Zdn/0ND8vqpl9xMvejPSk/4mIMNGuSrO8i/SzbgcM5ulS09KIw7GMoD6rwF peterphan@Peters-MacBook-Pro.local"
@@ -27,25 +27,27 @@ resource "aws_key_pair" "tf_usw2_ec2_key" {
 #   name = "tf-pphan-ssh-keypair-aws"
 # }
 
+#------------------------------------------------------------------------------
 # Use vpc module to create VPC, subnets, IGW, NGW, RT
+#------------------------------------------------------------------------------
 module "vpc_usw2-1" {
-  source = "terraform-aws-modules/vpc/aws"
-  name = "tf-${var.prefix}-${var.env}-uw1-vpc"
-  cidr = "${var.cidr}"
-  azs = ["us-west-2a","us-west-2b"]
+  source         = "terraform-aws-modules/vpc/aws"
+  name           = "tf-${var.prefix}-${var.env}-uw1-vpc"
+  cidr           = "${var.cidr}"
+  azs            = ["us-west-2a", "us-west-2b"]
   public_subnets = "${var.public_subnets}"
   #private_subnets     = "${var.private_subnets}"
   enable_dns_hostnames = true
-  enable_dns_support = true
+  enable_dns_support   = true
   # enable_nat_gateway = true
   # single_nat_gateway = true
-  tags = local.common_tags
-  igw_tags = { Name = "tf-${var.prefix}-${var.env}-usw2-1-IGW" }
-  nat_gateway_tags = { Name = "tf-${var.prefix}-${var.env}-usw2-1-NGW"}
-  public_route_table_tags = { Name = "tf-${var.prefix}-${var.env}-usw2-1-RT-public" }
-  public_subnet_tags = { Name = "tf-${var.prefix}-${var.env}-usw2-1-public" }
+  tags                     = local.common_tags
+  igw_tags                 = { Name = "tf-${var.prefix}-${var.env}-usw2-1-IGW" }
+  nat_gateway_tags         = { Name = "tf-${var.prefix}-${var.env}-usw2-1-NGW" }
+  public_route_table_tags  = { Name = "tf-${var.prefix}-${var.env}-usw2-1-RT-public" }
+  public_subnet_tags       = { Name = "tf-${var.prefix}-${var.env}-usw2-1-public" }
   private_route_table_tags = { Name = "tf-${var.prefix}-${var.env}-usw2-1-RT-private" }
-  private_subnet_tags = { Name = "tf-${var.prefix}-${var.env}-usw2-1-private" }
+  private_subnet_tags      = { Name = "tf-${var.prefix}-${var.env}-usw2-1-private" }
 }
 
 resource "aws_security_group" "usw2-1_bastion_sg" {
@@ -66,14 +68,13 @@ resource "aws_security_group" "egress_public_sg" {
   description = "Allow outbound"
   vpc_id      = module.vpc_usw2-1.vpc_id
   egress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
-    cidr_blocks     = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
   tags = local.common_tags
 }
-
 
 resource "aws_security_group" "vpc_usw2-1_ping_ssh_sg" {
   name        = "tf_${var.prefix}_${var.env}-ping-ssh-sg"
@@ -96,16 +97,16 @@ resource "aws_security_group" "vpc_usw2-1_ping_ssh_sg" {
 }
 
 data "aws_ami" "ubuntu" {
-    most_recent = true
-    filter {
-        name   = "name"
-        values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
-    }
-    filter {
-        name   = "virtualization-type"
-        values = ["hvm"]
-    }
-    owners = ["099720109477"] # Canonical
+  most_recent = true
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
+  }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+  owners = ["099720109477"] # Canonical
 }
 
 data "template_file" "user_data" {
@@ -128,65 +129,67 @@ data "template_file" "install_vault" {
   template = "${file("../templates/install-vault.sh.tpl")}"
 
   vars = {
-    vault_version  = "${var.vault_version}"
-    vault_zip = "vault_${var.vault_version}_linux_amd64.zip"
-    vault_url      = "https://releases.hashicorp.com/vault/${var.vault_version}/vault_${var.vault_version}_linux_amd64.zip"
-    vault_dir      = "/usr/local/bin"
-    vault_path     = "/usr/local/bin/vault"
-    vault_config_dir  = "/etc/vault.d"
-    vault_data_dir    = "/opt/vault/data"
-    vault_tls_dir   = "/opt/vault/tls"
-    vault_env_vars = "/etc/vault.d/vault.conf"
+    vault_version        = "${var.vault_version}"
+    vault_zip            = "vault_${var.vault_version}_linux_amd64.zip"
+    vault_url            = "https://releases.hashicorp.com/vault/${var.vault_version}/vault_${var.vault_version}_linux_amd64.zip"
+    vault_dir            = "/usr/local/bin"
+    vault_path           = "/usr/local/bin/vault"
+    vault_config_dir     = "/etc/vault.d"
+    vault_data_dir       = "/opt/vault/data"
+    vault_tls_dir        = "/opt/vault/tls"
+    vault_env_vars       = "/etc/vault.d/vault.conf"
     vault_profile_script = "/etc/profile.d/vault.sh"
-    name           = "${var.name}"
-    local_ip_url   = "${var.local_ip_url}"
-    vault_override = "${var.vault_config_override != "" ? true : false}"
-    vault_config   = "${var.vault_config_override}"
+    name                 = "${var.name}"
+    local_ip_url         = "${var.local_ip_url}"
+    vault_override       = "${var.vault_config_override != "" ? true : false}"
+    vault_config         = "${var.vault_config_override}"
   }
 }
 
-resource "aws_instance" "usw2-1_bastion" {
-  count = var.bastion_count
-  ami           = data.aws_ami.ubuntu.id
-  #ami                         = "${var.ubuntu_ami}"
-  instance_type               = var.vm_size
-  associate_public_ip_address = true
-  subnet_id                   = "${module.vpc_usw2-1.public_subnets[0]}"
-  vpc_security_group_ids     = ["${aws_security_group.usw2-1_bastion_sg.id}", 
-    "${aws_security_group.egress_public_sg.id}",
-    "${module.vpc_usw2-1.default_security_group_id}",
-  ]
-  key_name                    = aws_key_pair.tf_usw2_ec2_key.key_name
-  # key_name = module.ssh_keypair_aws.name
-  user_data = <<EOF
-${data.template_file.install_base.rendered} # Runtime install base tools
-${data.template_file.install_vault.rendered} # Install Vault
-${data.template_file.install_docker.rendered}
-EOF
-  private_ip                  = "10.10.1.10"
+#------------------------------------------------------------------------------
+# Need to move below config to a module
+#------------------------------------------------------------------------------
+# resource "aws_instance" "usw2-1_bastion" {
+#   count = var.bastion_count
+#   ami   = data.aws_ami.ubuntu.id
+#   #ami                         = "${var.ubuntu_ami}"
+#   instance_type               = var.vm_size
+#   associate_public_ip_address = true
+#   subnet_id                   = "${module.vpc_usw2-1.public_subnets[0]}"
+#   vpc_security_group_ids = ["${aws_security_group.usw2-1_bastion_sg.id}",
+#     "${aws_security_group.egress_public_sg.id}",
+#     "${module.vpc_usw2-1.default_security_group_id}",
+#   ]
+#   key_name = aws_key_pair.tf_usw2_ec2_key.key_name
+#   # key_name = module.ssh_keypair_aws.name
+#   user_data = <<EOF
+# ${data.template_file.install_base.rendered} # Runtime install base tools
+# ${data.template_file.install_vault.rendered} # Install Vault
+# ${data.template_file.install_docker.rendered}
+# EOF
+#   private_ip = "10.10.1.10"
 
-  tags = local.common_tags
-}
+#   tags = local.common_tags
+# }
 
 resource "aws_instance" "vpc_usw2-1_pri_ubuntu" {
   count = "${var.internal_vm_count}"
-  ami           = "${data.aws_ami.ubuntu.id}"
+  ami = "${data.aws_ami.ubuntu.id}"
   #ami                         = "${var.ubuntu_ami}"
-  instance_type               = "${var.vm_size}"
-  subnet_id                   = "${module.vpc_usw2-1.private_subnets[0]}"
-  vpc_security_group_ids     = [
-    "${aws_security_group.vpc_usw2-1_ping_ssh_sg.id}", 
+  instance_type = "${var.vm_size}"
+  subnet_id = "${module.vpc_usw2-1.private_subnets[0]}"
+  vpc_security_group_ids = [
+    "${aws_security_group.vpc_usw2-1_ping_ssh_sg.id}",
     "${module.vpc_usw2-1.default_security_group_id}",
     "${aws_security_group.elb-sg.id}"
   ]
-  key_name                    = "${aws_key_pair.tf_usw2_ec2_key.key_name}"
+  key_name = "${aws_key_pair.tf_usw2_ec2_key.key_name}"
   # key_name = module.ssh_keypair_aws.name
-  private_ip                  = "10.10.11.1${count.index}"
+  private_ip = "10.10.11.1${count.index}"
   user_data = <<EOF
 ${data.template_file.install_base.rendered} # Runtime install base tools
 ${data.template_file.install_vault.rendered} # Runtime install Vault in -dev mode
 EOF
-  # user_data                   = "${data.template_file.user_data.rendered}"
   # connection {
   #   user = "ubuntu"
   #   host = "${self.public_ip}"
@@ -223,6 +226,10 @@ resource "aws_security_group" "elb-sg" {
   }
   tags = local.common_tags
 }
+
+#------------------------------------------------------------------------------
+# Configuration for ELB. Uncomment if desired.
+#------------------------------------------------------------------------------
 
 # resource "aws_elb" "web" {
 #   name = "tf-${var.prefix}-${var.env}-example-elb"

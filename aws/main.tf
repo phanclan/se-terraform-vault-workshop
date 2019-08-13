@@ -11,7 +11,7 @@
 a known working version. If you leave this out you'll get the latest
 version. */
 
-terraform { 
+terraform {
   required_version = ">= 0.12.0"
   # backend "remote" {
   #   organization = "phanpeterhc1"

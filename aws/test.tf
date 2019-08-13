@@ -13,13 +13,13 @@ data "template_file" "init" {
     test = "${var.names}"
   }
 }
- 
+
 # resource "null_resource" "web" {
 #   count = "${length(split(",", var.names))}"
 #   triggers = {
 #     template_rendered = "${join(",", data.template_file.init.*.rendered)}"
 #   }
- 
+
 #   provisioner "local-exec" {
 #     command = "echo \"${join(",", data.template_file.init.*.rendered)}\" >> out.txt"
 #   }
