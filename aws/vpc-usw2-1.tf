@@ -155,11 +155,11 @@ data "template_file" "install_hashi" {
 }
 
 #------------------------------------------------------------------------------
-# Need to move below config to a module
+# VM INSTANCES
 #------------------------------------------------------------------------------
 module "usw2-1_bastion" {
   source = "terraform-aws-modules/ec2-instance/aws"
-  instance_count = 1
+  instance_count = var.bastion_count
   name = "phan" # name_prefix
   ami = data.aws_ami.ubuntu.id
   instance_type = var.vm_size

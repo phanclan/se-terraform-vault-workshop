@@ -3,3 +3,5 @@
 
 prefix = "pphan"
 region = "us-west-2"
+bastion_count = "1"
+internal_vm_count = "1"
