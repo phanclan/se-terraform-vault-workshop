@@ -42,8 +42,9 @@ output "usw2-1_bastion_pub_ip_module" {
 #   value = "Instances: ${element(aws_instance.vpc_usw2-1_pri_ubuntu.*.id,0)}"
 # }
 # Using the new splat operator (*)
-output "vpc_usw2-1_pri_ubuntu" {
-  value = "${aws_instance.vpc_usw2-1_pri_ubuntu[*].private_ip}"
+output "usw2-1_pri_ubuntu" {
+  value = module.usw2-1_pri_ubuntu.*.public_ip
+  # value = "${aws_instance.vpc_usw2-1_pri_ubuntu[*].private_ip}"
 }
 # New conditional expression with lists ()
 output "vpc_usw2-1_pri_ubuntu_new_cond" {

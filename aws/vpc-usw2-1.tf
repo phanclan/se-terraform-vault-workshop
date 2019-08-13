@@ -179,7 +179,7 @@ EOF
   tags = local.common_tags
 }
 
-module "vpc_usw2-1_pri_ubuntu" {
+module "usw2-1_pri_ubuntu" {
   source = "terraform-aws-modules/ec2-instance/aws"
   instance_count = var.internal_vm_count
   name = "phant" # name_prefix
@@ -192,7 +192,10 @@ module "vpc_usw2-1_pri_ubuntu" {
     "${aws_security_group.elb-sg.id}"
   ]
   key_name = aws_key_pair.tf_usw2_ec2_key.key_name
-  private_ip = "10.10.11.1${count.index}"
+  # count.index does not work with module
+  # private_ip = "10.10.11.1${count.index}"
+  private_ip = "10.10.11.10"
+  #private_ips = ["10.10.11.10","10.10.11.11"] # need to match instance_count
   user_data  = <<EOF
 ${data.template_file.install_base.rendered} # Runtime install base tools
 ${data.template_file.install_docker.rendered} # Install Docker
