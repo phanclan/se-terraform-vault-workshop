@@ -185,6 +185,7 @@ module "usw2-1_bastion" {
   name = "phan" # name_prefix
   ami = data.aws_ami.ubuntu.id
   instance_type = var.vm_size
+  key_name = aws_key_pair.tf_usw2_ec2_key.key_name
   subnet_id = module.vpc_usw2-1.public_subnets[0]
   vpc_security_group_ids = ["${aws_security_group.usw2-1_bastion_sg.id}",
     "${aws_security_group.egress_public_sg.id}",
