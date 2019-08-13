@@ -28,9 +28,9 @@
 # }
 
 
-output "usw2-1_bastion_pub_ip" {
-  value = "${aws_instance.usw2-1_bastion.*.public_ip}"
-}
+# output "usw2-1_bastion_pub_ip" {
+#   value = "${aws_instance.usw2-1_bastion.*.public_ip}"
+# }
 # output "usw2-1_bastion_pub_fqdn" {
 #   value = "${aws_instance.usw2-1_bastion.public_dns}"
 # }
