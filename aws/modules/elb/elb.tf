@@ -19,7 +19,7 @@ resource "aws_security_group" "elb-sg" {
   }
   # tags = local.common_tags
 }
-output {elb-sg-id} {
+output "elb-sg-id" {
   value = aws_security_group.elb-sg.id
 }
 #------------------------------------------------------------------------------
