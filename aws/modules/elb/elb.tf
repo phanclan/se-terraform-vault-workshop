@@ -41,6 +41,6 @@ resource "aws_elb" "web" {
   }
 
   # The instances are registered automatically
-  instances = [$var.instances]
+  instances = [${var.instances}]
 }
 
