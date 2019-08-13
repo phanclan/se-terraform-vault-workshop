@@ -71,7 +71,10 @@ variable "name" { default = "hashistack-dev" }
 variable "local_ip_url" { default = "http://169.254.169.254/latest/meta-data/local-ipv4" }
 
 variable "hashistack_servers" { default = 1 }
-variable "hashistack_instance" { default = "t2.micro" }
+variable "hashistack_instance" { default = "t3.micro" }
+variable "VAULT_VERSION" { default = "1.1.3" }
+variable "TF_VERSION" { default = "0.12.6" }
+variable "CONSUL_VERSION" { default = "1.5.3" }
 variable "hashistack_consul_version" { default = "1.2.3" }
 variable "vault_version" { default = "1.2.0" }
 variable "hashistack_nomad_version" { default = "0.8.6" }

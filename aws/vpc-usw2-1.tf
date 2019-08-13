@@ -98,7 +98,7 @@ resource "aws_security_group" "vpc_usw2-1_ping_ssh_sg" {
 
 data "aws_ami" "ubuntu" {
   most_recent = true
-  owners = ["099720109477"] # Canonical
+  owners      = ["099720109477"] # Canonical
   filter {
     name   = "name"
     values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
@@ -147,8 +147,8 @@ data "template_file" "install_vault" {
 data "template_file" "install_hashi" {
   template = "${file("${path.root}/../templates/install-hashi.sh.tpl")}"
   vars = {
-    TF_VERSION = var.TF_VERSION
-    VAULT_VERSION = var.VAULT_VERSION
+    TF_VERSION     = var.TF_VERSION
+    VAULT_VERSION  = var.VAULT_VERSION
     CONSUL_VERSION = var.CONSUL_VERSION
   }
 }
@@ -200,10 +200,10 @@ EOF
 
 resource "aws_instance" "vpc_usw2-1_pri_ubuntu" {
   count = "${var.internal_vm_count}"
-  ami = "${data.aws_ami.ubuntu.id}"
+  ami   = "${data.aws_ami.ubuntu.id}"
   #ami                         = "${var.ubuntu_ami}"
   instance_type = "${var.vm_size}"
-  subnet_id = "${module.vpc_usw2-1.private_subnets[0]}"
+  subnet_id     = "${module.vpc_usw2-1.private_subnets[0]}"
   vpc_security_group_ids = [
     "${aws_security_group.vpc_usw2-1_ping_ssh_sg.id}",
     "${module.vpc_usw2-1.default_security_group_id}",
@@ -212,7 +212,7 @@ resource "aws_instance" "vpc_usw2-1_pri_ubuntu" {
   key_name = "${aws_key_pair.tf_usw2_ec2_key.key_name}"
   # key_name = module.ssh_keypair_aws.name
   private_ip = "10.10.11.1${count.index}"
-  user_data = <<EOF
+  user_data  = <<EOF
 ${data.template_file.install_base.rendered} # Runtime install base tools
 ${data.template_file.install_hashi.rendered} # Runtime install Vault in -dev mode
 EOF
@@ -233,21 +233,21 @@ EOF
 
 # A security group for the ELB so it is accessible via the web
 resource "aws_security_group" "elb-sg" {
-  name        = "tf-${var.prefix}-${var.env}-sg"
+  name = "tf-${var.prefix}-${var.env}-sg"
   description = "Used in the terraform"
-  vpc_id      = "${module.vpc_usw2-1.vpc_id}"
+  vpc_id = "${module.vpc_usw2-1.vpc_id}"
   # HTTP access from anywhere
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
   # outbound internet access
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
   tags = local.common_tags
