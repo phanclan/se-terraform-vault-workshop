@@ -157,28 +157,27 @@ data "template_file" "install_hashi" {
 #------------------------------------------------------------------------------
 # Need to move below config to a module
 #------------------------------------------------------------------------------
-resource "aws_instance" "usw2-1_bastion" {
-  count = var.bastion_count
-  ami   = data.aws_ami.ubuntu.id
-  #ami                         = "${var.ubuntu_ami}"
-  instance_type               = var.vm_size
-  associate_public_ip_address = true
-  subnet_id                   = "${module.vpc_usw2-1.public_subnets[0]}"
-  vpc_security_group_ids = ["${aws_security_group.usw2-1_bastion_sg.id}",
-    "${aws_security_group.egress_public_sg.id}",
-    "${module.vpc_usw2-1.default_security_group_id}",
-  ]
-  key_name = aws_key_pair.tf_usw2_ec2_key.key_name
-  # key_name = module.ssh_keypair_aws.name
-  user_data = <<EOF
-${data.template_file.install_base.rendered} # Runtime install base tools
-${data.template_file.install_hashi.rendered} # Install Vault
-${data.template_file.install_docker.rendered}
-EOF
-  private_ip = "10.10.1.10"
+# resource "aws_instance" "usw2-1_bastion" {
+#   count = var.bastion_count
+#   ami   = data.aws_ami.ubuntu.id
+#   instance_type               = var.vm_size
+#   associate_public_ip_address = true
+#   subnet_id                   = "${module.vpc_usw2-1.public_subnets[0]}"
+#   vpc_security_group_ids = ["${aws_security_group.usw2-1_bastion_sg.id}",
+#     "${aws_security_group.egress_public_sg.id}",
+#     "${module.vpc_usw2-1.default_security_group_id}",
+#   ]
+#   key_name = aws_key_pair.tf_usw2_ec2_key.key_name
+#   # key_name = module.ssh_keypair_aws.name
+#   user_data = <<EOF
+# ${data.template_file.install_base.rendered} # Runtime install base tools
+# ${data.template_file.install_hashi.rendered} # Install Vault
+# ${data.template_file.install_docker.rendered}
+# EOF
+#   private_ip = "10.10.1.10"
 
-  tags = local.common_tags
-}
+#   tags = local.common_tags
+# }
 module "usw2-1_bastion" {
   source = "terraform-aws-modules/ec2-instance/aws"
   instance_count = 1
