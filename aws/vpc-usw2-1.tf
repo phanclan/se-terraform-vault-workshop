@@ -125,7 +125,7 @@ data "template_file" "install_base" {
 data "template_file" "install_docker" {
   template = "${file("../templates/install-docker.sh.tpl")}"
 }
-data "template_file" "install_hashi" {
+data "template_file" "install_vault" {
   template = "${file("../templates/install-hashi.sh.tpl")}"
   vars = {
     vault_version        = "${var.vault_version}"
@@ -142,6 +142,14 @@ data "template_file" "install_hashi" {
     local_ip_url         = "${var.local_ip_url}"
     vault_override       = "${var.vault_config_override != "" ? true : false}"
     vault_config         = "${var.vault_config_override}"
+  }
+}
+data "template_file" "install-hashi" {
+  template = "${file("${path.root}/../templates/install-hashi.sh.tpl")}"
+  vars = {
+    TF_VERSION = var.TF_VERSION
+    VAULT_VERSION = var.VAULT_VERSION
+    CONSUL_VERSION = var.CONSUL_VERSION
   }
 }
 
