@@ -191,7 +191,7 @@ module "usw2-1_pri_ubuntu" {
   vpc_security_group_ids = [
     "${aws_security_group.vpc_usw2-1_ping_ssh_sg.id}",
     "${module.vpc_usw2-1.default_security_group_id}",
-    "${aws_security_group.elb-sg.id}"
+    "${module.usw2-1_elb.elb-sg-id}"
   ]
   key_name = aws_key_pair.tf_usw2_ec2_key.key_name
   # count.index does not work with module

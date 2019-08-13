@@ -19,13 +19,15 @@ resource "aws_security_group" "elb-sg" {
   }
   # tags = local.common_tags
 }
-
+output {elb-sg-id} {
+  value = aws_security_group.elb-sg.id
+}
 #------------------------------------------------------------------------------
 # Configuration for ELB. Uncomment if desired.
 #------------------------------------------------------------------------------
 
 # resource "aws_elb" "web" {
-#   name = "tf-${var.prefix}-${var.env}-example-elb"
+#   name = "${var.name_prefix}-example-elb"
 
 #   # The same availability zone as our instances
 #   subnets = "${module.vpc_usw2-1.public_subnets}"
