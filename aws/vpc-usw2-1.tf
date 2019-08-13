@@ -125,25 +125,26 @@ data "template_file" "install_base" {
 data "template_file" "install_docker" {
   template = "${file("../templates/install-docker.sh.tpl")}"
 }
-data "template_file" "install_vault" {
-  template = "${file("../templates/install-hashi.sh.tpl")}"
-  vars = {
-    vault_version        = "${var.vault_version}"
-    vault_zip            = "vault_${var.vault_version}_linux_amd64.zip"
-    vault_url            = "https://releases.hashicorp.com/vault/${var.vault_version}/vault_${var.vault_version}_linux_amd64.zip"
-    vault_dir            = "/usr/local/bin"
-    vault_path           = "/usr/local/bin/vault"
-    vault_config_dir     = "/etc/vault.d"
-    vault_data_dir       = "/opt/vault/data"
-    vault_tls_dir        = "/opt/vault/tls"
-    vault_env_vars       = "/etc/vault.d/vault.conf"
-    vault_profile_script = "/etc/profile.d/vault.sh"
-    name                 = "${var.name}"
-    local_ip_url         = "${var.local_ip_url}"
-    vault_override       = "${var.vault_config_override != "" ? true : false}"
-    vault_config         = "${var.vault_config_override}"
-  }
-}
+# data "template_file" "install_vault" {
+#   template = "${file("../templates/install-hashi.sh.tpl")}"
+#   vars = {
+#     vault_version        = "${var.vault_version}"
+#     vault_zip            = "vault_${var.vault_version}_linux_amd64.zip"
+#     vault_url            = "https://releases.hashicorp.com/vault/${var.vault_version}/vault_${var.vault_version}_linux_amd64.zip"
+#     vault_dir            = "/usr/local/bin"
+#     vault_path           = "/usr/local/bin/vault"
+#     vault_config_dir     = "/etc/vault.d"
+#     vault_data_dir       = "/opt/vault/data"
+#     vault_tls_dir        = "/opt/vault/tls"
+#     vault_env_vars       = "/etc/vault.d/vault.conf"
+#     vault_profile_script = "/etc/profile.d/vault.sh"
+#     name                 = "${var.name}"
+#     local_ip_url         = "${var.local_ip_url}"
+#     vault_override       = "${var.vault_config_override != "" ? true : false}"
+#     vault_config         = "${var.vault_config_override}"
+#   }
+# }
+
 data "template_file" "install_hashi" {
   template = "${file("${path.root}/../templates/install-hashi.sh.tpl")}"
   vars = {
