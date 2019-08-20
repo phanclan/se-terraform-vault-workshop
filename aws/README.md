@@ -25,3 +25,9 @@ If you're teaching this workshop to a class, head on over to the [Instructor Not
 1. troubleshoot your user_data execution. logs here /var/log/cloud-init-output.log
 1. defined local for tags
 1. Moved provider configuration to provider.tf.
+1. Have problems with count in module for private_ip
+```
+  # private_ip = "10.10.11.1${count.index}"
+  # private_ip = "10.10.11.10"
+  private_ips = ["10.10.11.10","10.10.11.11"] # need to match instance_count
+```

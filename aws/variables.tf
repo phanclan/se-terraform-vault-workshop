@@ -33,7 +33,7 @@ variable "address_space" {
 
 variable "prefix" {
   description = "This prefix will be included in the name of most resources."
-  default = "pphan"
+  default     = "pphan"
 }
 variable "env" {
   default = "dev"
@@ -53,6 +53,13 @@ variable "public_subnets" {
 }
 variable "private_subnets" {
   default = ["10.10.11.0/24", "10.10.12.0/24"]
+}
+variable "private_ips" {
+  default = {
+    "10.10.11.10" = 1
+    "10.10.11.10" = 2
+    "10.10.11.10" = 3
+  }
 }
 
 # the following four variables were before modules

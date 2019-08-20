@@ -28,29 +28,29 @@
 # }
 
 
-output "usw2-1_bastion_pub_ip_module" {
+output "usw2-1_bastion_pub_ip" {
   value = module.usw2-1_bastion.*.public_ip
-}
-output "private_ip" {
-  value = module.usw2-1_pri_ubuntu.*.private_ip
 }
 # output "usw2-1_bastion_pub_fqdn" {
 #   value = "${aws_instance.usw2-1_bastion.public_dns}"
 # }
 
-# output "vpc_usw2-1_pri_ubuntu0" {
+# output "usw2-1_pri_ubuntu0" {
 #   value = "Instances: ${element(aws_instance.vpc_usw2-1_pri_ubuntu.*.id,0)}"
 # }
-# Using the new splat operator (*)
-output "usw2-1_pri_ubuntu" {
-  value = module.usw2-1_pri_ubuntu.*.public_ip
-  # value = "${aws_instance.vpc_usw2-1_pri_ubuntu[*].private_ip}"
+# Using the splat operator [*]
+output "usw2-1_pri_ubuntu_splatnew" {
+  value = module.usw2-1_pri_ubuntu[*].public_ip # new splat operator "<name>[*]."
+}
+output "usw2-1_pri_ubuntu_splatold" {
+  value = module.usw2-1_pri_ubuntu.*.private_ip # old splat "<name>.*."
 }
 # New conditional expression with lists ()
-# output "vpc_usw2-1_pri_ubuntu_new_cond" {
+#------------------------------------------------------------------------------
+# output "usw2-1_pri_ubuntu_new_cond" {
 #   value = [
 #     for instance in module.usw2-1_pri_ubuntu :
-#     (instance.public_ip != "" ? list(instance.private_ip, instance.public_ip) : list(instance.private_ip))
+#     # (instance.public_ip != "" ? list(instance.private_ip, instance.public_ip) : list(instance.private_ip))
 #   ]
 # }
 # New conditional expression with lists []
